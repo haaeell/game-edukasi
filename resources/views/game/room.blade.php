@@ -4,6 +4,17 @@
     <style>
         #card-stage {
             position: relative;
+            perspective: 1600px;
+        }
+
+        #card-stage::before {
+            content: "";
+            position: absolute;
+            inset: -12% 3%;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(58% 58% at 50% 42%, rgba(129, 140, 248, 0.18), transparent 72%);
+            filter: blur(22px);
         }
 
         #card-stage.is-shuffling .shuffle-overlay {
@@ -11,54 +22,194 @@
             pointer-events: auto;
         }
 
-        #card-stage.is-shuffling .shuffle-overlay-card:nth-child(1) {
-            animation: shuffle-card-left 0.95s ease-in-out;
-        }
-
-        #card-stage.is-shuffling .shuffle-overlay-card:nth-child(2) {
-            animation: shuffle-card-center 0.95s ease-in-out;
-        }
-
-        #card-stage.is-shuffling .shuffle-overlay-card:nth-child(3) {
-            animation: shuffle-card-right 0.95s ease-in-out;
-        }
+        #card-stage.is-shuffling .shuffle-overlay-card:nth-child(1) { animation: riffle-1 0.72s cubic-bezier(0.45, 0, 0.25, 1); }
+        #card-stage.is-shuffling .shuffle-overlay-card:nth-child(2) { animation: riffle-2 0.72s cubic-bezier(0.45, 0, 0.25, 1); }
+        #card-stage.is-shuffling .shuffle-overlay-card:nth-child(3) { animation: riffle-3 0.72s cubic-bezier(0.45, 0, 0.25, 1); }
+        #card-stage.is-shuffling .shuffle-overlay-card:nth-child(4) { animation: riffle-4 0.72s cubic-bezier(0.45, 0, 0.25, 1); }
+        #card-stage.is-shuffling .shuffle-overlay-card:nth-child(5) { animation: riffle-5 0.72s cubic-bezier(0.45, 0, 0.25, 1); }
 
         #card-stage.is-shuffling #active-card-panel {
-            opacity: 0.55;
-            transform: scale(0.98);
+            opacity: 0.3;
+            transform: scale(0.95);
+            filter: blur(1.5px);
         }
 
+        /* ===== Active card (center) ===== */
         #active-card-panel {
-            transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            --card-accent: 129, 140, 248;
+            --card-accent-2: 99, 102, 241;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            border-radius: 2.6rem;
+            border: 1px solid rgba(var(--card-accent), 0.3);
+            background:
+                radial-gradient(130% 100% at 50% -12%, rgba(var(--card-accent), 0.14), transparent 58%),
+                linear-gradient(180deg, #ffffff 0%, #f7f8ff 100%);
+            box-shadow:
+                0 34px 80px -34px rgba(var(--card-accent), 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            transform-style: preserve-3d;
+            transition: opacity 0.35s ease, transform 0.35s ease, box-shadow 0.4s ease,
+                        filter 0.35s ease, border-color 0.45s ease, background 0.45s ease;
+        }
+
+        #active-card-panel.state-finished {
+            --card-accent: 16, 185, 129;
+            --card-accent-2: 5, 150, 105;
+        }
+
+        #active-card-panel.state-waiting {
+            --card-accent: 148, 163, 184;
+            --card-accent-2: 100, 116, 139;
+        }
+
+        #active-card-panel:hover {
+            box-shadow:
+                0 42px 92px -30px rgba(var(--card-accent), 0.65),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        #active-card-panel.is-revealing {
+            animation: active-card-reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .card-aura {
+            position: absolute;
+            z-index: 0;
+            top: -32%;
+            left: 50%;
+            width: 115%;
+            height: 120%;
+            transform: translateX(-50%);
+            background: radial-gradient(closest-side, rgba(var(--card-accent), 0.4), transparent 72%);
+            filter: blur(46px);
+            opacity: 0.85;
+            pointer-events: none;
+            animation: card-aura-float 8s ease-in-out infinite;
+        }
+
+        @keyframes card-aura-float {
+            0%, 100% { transform: translateX(-50%) translateY(0) scale(1); }
+            50%      { transform: translateX(-50%) translateY(22px) scale(1.08); }
+        }
+
+        .card-accent-bar {
+            position: absolute;
+            top: 0;
+            left: 16%;
+            right: 16%;
+            height: 4px;
+            z-index: 2;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, rgba(var(--card-accent), 0.95), rgba(var(--card-accent-2), 0.95), transparent);
+        }
+
+        .card-watermark {
+            position: absolute;
+            right: -1.6rem;
+            bottom: -2.6rem;
+            z-index: 0;
+            font-size: 11rem;
+            line-height: 1;
+            color: rgba(var(--card-accent), 0.07);
+            pointer-events: none;
+            transform: rotate(-8deg);
+        }
+
+        .card-shine {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.5) 48%, transparent 60%);
+            transform: translateX(-130%);
+            transition: transform 1s ease;
+        }
+
+        #active-card-panel:hover .card-shine {
+            transform: translateX(130%);
+        }
+
+        #card-content {
+            position: relative;
+            z-index: 3;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        #active-card-icon {
+            position: relative;
+            color: rgb(var(--card-accent-2));
+            background:
+                radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9), transparent 60%),
+                linear-gradient(145deg, rgba(var(--card-accent), 0.16), rgba(var(--card-accent-2), 0.2));
+            box-shadow: 0 12px 26px -8px rgba(var(--card-accent), 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+
+        #active-card-panel.state-playing #active-card-icon {
+            animation: card-icon-pulse 2.6s ease-in-out infinite;
+        }
+
+        @keyframes card-icon-pulse {
+            0%, 100% { box-shadow: 0 12px 26px -8px rgba(var(--card-accent), 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 0 rgba(var(--card-accent), 0.4); }
+            50%      { box-shadow: 0 12px 26px -8px rgba(var(--card-accent), 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 15px rgba(var(--card-accent), 0); }
+        }
+
+        .card-order-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            color: rgb(var(--card-accent-2));
+            background: rgba(var(--card-accent), 0.13);
+        }
+
+        .card-order-pill .dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 999px;
+            background: rgb(var(--card-accent-2));
+            animation: card-dot-pulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes card-dot-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(var(--card-accent), 0.55); }
+            50%      { box-shadow: 0 0 0 6px rgba(var(--card-accent), 0); }
+        }
+
+        .card-question-box {
+            position: relative;
+            border: 1px solid rgba(var(--card-accent), 0.18);
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(6px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 18px 40px -30px rgba(var(--card-accent), 0.6);
+        }
+
+        .card-footer-chip {
+            color: rgb(var(--card-accent-2));
+            background: rgba(var(--card-accent), 0.13);
+        }
+
+        #active-card-panel:not(.state-playing) .card-order-pill,
+        #active-card-panel:not(.state-playing) #active-card-footer {
+            display: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .card-aura,
+            #active-card-panel.state-playing #active-card-icon,
+            .card-order-pill .dot {
+                animation: none;
+            }
         }
 
         @keyframes active-card-reveal {
-            0% { opacity: 0.15; transform: perspective(1400px) rotateY(-24deg) rotateX(8deg) scale(0.92); }
-            55% { opacity: 0.88; transform: perspective(1400px) rotateY(12deg) rotateX(-3deg) scale(1.02); }
+            0%   { opacity: 0; transform: perspective(1400px) rotateY(-34deg) rotateX(10deg) translateY(16px) scale(0.9); }
+            55%  { opacity: 1; transform: perspective(1400px) rotateY(9deg) rotateX(-3deg) scale(1.02); }
             100% { opacity: 1; transform: perspective(1400px) rotateY(0deg) rotateX(0deg) scale(1); }
         }
 
-        @keyframes shuffle-card-left {
-            0% { transform: translateX(-40px) rotate(-16deg); opacity: 0; }
-            20% { opacity: 1; }
-            50% { transform: translateX(76px) rotate(8deg); }
-            100% { transform: translateX(-12px) rotate(-10deg); opacity: 0; }
-        }
-
-        @keyframes shuffle-card-center {
-            0% { transform: translateY(24px) rotate(0deg) scale(0.96); opacity: 0; }
-            20% { opacity: 1; }
-            50% { transform: translateY(-20px) rotate(-2deg) scale(1.02); }
-            100% { transform: translateY(12px) rotate(2deg) scale(0.98); opacity: 0; }
-        }
-
-        @keyframes shuffle-card-right {
-            0% { transform: translateX(40px) rotate(16deg); opacity: 0; }
-            20% { opacity: 1; }
-            50% { transform: translateX(-76px) rotate(-8deg); }
-            100% { transform: translateX(12px) rotate(10deg); opacity: 0; }
-        }
-
+        /* ===== Riffle shuffle overlay ===== */
         .shuffle-overlay {
             position: absolute;
             inset: 0;
@@ -66,21 +217,170 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0;
             opacity: 0;
             pointer-events: none;
+            transform-style: preserve-3d;
+            transition: opacity 0.2s ease;
         }
 
         .shuffle-overlay-card {
             position: absolute;
-            width: min(280px, 28vw);
-            height: min(390px, 54vw);
-            border-radius: 2rem;
-            border: 1px solid rgba(147, 197, 253, 0.9);
+            width: min(230px, 25vw);
+            height: min(322px, 46vw);
+            border-radius: 1.7rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
             background:
-                radial-gradient(circle at top, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.08)),
-                linear-gradient(180deg, #b5cdfd 0%, #7aa3f5 100%);
-            box-shadow: 0 24px 60px rgba(96, 138, 240, 0.24);
+                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.13) 0 7px, transparent 7px 15px),
+                repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.10) 0 7px, transparent 7px 15px),
+                radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.4), transparent 55%),
+                linear-gradient(165deg, #7ea6f7 0%, #5273da 55%, #3a55bd 100%);
+            box-shadow:
+                0 30px 55px -16px rgba(52, 82, 190, 0.62),
+                inset 0 0 0 6px rgba(255, 255, 255, 0.12),
+                inset 0 0 0 7px rgba(255, 255, 255, 0.06);
+            backface-visibility: hidden;
+        }
+
+        .shuffle-overlay-card::after {
+            content: "\f004";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 400;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            color: rgba(255, 255, 255, 0.75);
+            text-shadow: 0 2px 6px rgba(30, 58, 138, 0.35);
+        }
+
+        @keyframes riffle-1 {
+            0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+            18%  { opacity: 1; }
+            50%  { transform: translate3d(-155px, -26px, 70px) rotate(-24deg); }
+            100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+        }
+
+        @keyframes riffle-2 {
+            0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+            18%  { opacity: 1; }
+            50%  { transform: translate3d(155px, -26px, 70px) rotate(24deg); }
+            100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+        }
+
+        @keyframes riffle-3 {
+            0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0; }
+            18%  { opacity: 1; }
+            50%  { transform: translate3d(0, -66px, 100px) rotate(0deg) scale(1.06); }
+            100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0; }
+        }
+
+        @keyframes riffle-4 {
+            0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+            18%  { opacity: 1; }
+            50%  { transform: translate3d(-92px, 26px, 45px) rotate(-13deg); }
+            100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+        }
+
+        @keyframes riffle-5 {
+            0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+            18%  { opacity: 1; }
+            50%  { transform: translate3d(92px, 26px, 45px) rotate(13deg); }
+            100% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+        }
+
+        /* ===== Realistic deck cards (sides) ===== */
+        .deck-stack {
+            position: relative;
+            height: 24rem;
+            width: 100%;
+        }
+
+        .deck-layer {
+            position: absolute;
+            inset: 0;
+            border-radius: 1.9rem;
+        }
+
+        .deck-layer.back-2 {
+            transform: translate(15px, 17px) rotate(6deg) scale(0.965);
+            opacity: 0.5;
+        }
+
+        .deck-layer.back-1 {
+            transform: translate(8px, 9px) rotate(3deg) scale(0.985);
+            opacity: 0.78;
+        }
+
+        .play-card {
+            position: absolute;
+            inset: 0;
+            border-radius: 1.9rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            background:
+                radial-gradient(120% 80% at 30% 0%, rgba(255, 255, 255, 0.92), transparent 55%),
+                linear-gradient(165deg, #d3e0ff 0%, #a2bcf8 48%, #6f92ee 100%);
+            box-shadow:
+                0 34px 60px -24px rgba(60, 96, 210, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        }
+
+        .play-card::after {
+            content: "";
+            position: absolute;
+            top: -40%;
+            left: -35%;
+            width: 55%;
+            height: 190%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transform: rotate(20deg);
+            pointer-events: none;
+        }
+
+        .card-frame {
+            position: absolute;
+            inset: 0.85rem;
+            border-radius: 1.35rem;
+            border: 1.5px solid rgba(255, 255, 255, 0.55);
+            box-shadow: inset 0 0 0 1px rgba(96, 138, 240, 0.22);
+            pointer-events: none;
+        }
+
+        .card-index {
+            position: absolute;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(40, 70, 160, 0.45);
+        }
+
+        .card-index.tl { top: 1.3rem; left: 1.3rem; }
+        .card-index.br { bottom: 1.3rem; right: 1.3rem; transform: rotate(180deg); }
+
+        @keyframes deck-float-left {
+            0%, 100% { transform: rotate(-9deg) translateY(0); }
+            50%      { transform: rotate(-9deg) translateY(-12px); }
+        }
+
+        @keyframes deck-float-right {
+            0%, 100% { transform: rotate(9deg) translateY(0); }
+            50%      { transform: rotate(9deg) translateY(-12px); }
+        }
+
+        [data-deck-card="left"] .deck-stack { animation: deck-float-left 6.2s ease-in-out infinite; }
+        [data-deck-card="right"] .deck-stack { animation: deck-float-right 7s ease-in-out infinite; }
+
+        @media (prefers-reduced-motion: reduce) {
+            [data-deck-card="left"] .deck-stack,
+            [data-deck-card="right"] .deck-stack {
+                animation: none;
+            }
         }
 
         .room-grid {
@@ -332,53 +632,79 @@
                                     <div class="shuffle-overlay-card"></div>
                                     <div class="shuffle-overlay-card"></div>
                                     <div class="shuffle-overlay-card"></div>
+                                    <div class="shuffle-overlay-card"></div>
+                                    <div class="shuffle-overlay-card"></div>
                                 </div>
 
                                 <div class="relative hidden xl:block" data-deck-card="left">
-                                    <div class="absolute inset-6 rounded-[2.2rem] border border-blue-100 bg-[linear-gradient(180deg,_#d9e5ff_0%,_#abc4ff_100%)] opacity-70"></div>
-                                    <div class="relative flex h-[23rem] items-center justify-center rounded-[2.6rem] border border-blue-200/80 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.85),_rgba(255,255,255,0.08)),linear-gradient(180deg,_#b6cdfd_0%,_#82a8f8_100%)] shadow-[0_28px_50px_rgba(96,138,240,0.28)] rotate-[-8deg]">
-                                        <div class="text-center text-white/90">
-                                            <div class="text-4xl"><i class="fa-regular fa-heart"></i></div>
-                                            <div class="mt-4 text-base font-semibold uppercase tracking-[0.28em]">Reflection</div>
+                                    <div class="deck-stack">
+                                        <div class="deck-layer play-card back-2"></div>
+                                        <div class="deck-layer play-card back-1"></div>
+                                        <div class="play-card">
+                                            <div class="card-frame"></div>
+                                            <span class="card-index tl"><i class="fa-solid fa-heart text-sm"></i><span class="mt-1 text-[0.6rem] tracking-[0.15em]">RF</span></span>
+                                            <span class="card-index br"><i class="fa-solid fa-heart text-sm"></i><span class="mt-1 text-[0.6rem] tracking-[0.15em]">RF</span></span>
+                                            <div class="relative flex h-full flex-col items-center justify-center text-white">
+                                                <div class="flex h-16 w-16 items-center justify-center rounded-[1.3rem] border border-white/40 bg-white/20 text-3xl shadow-inner backdrop-blur-sm"><i class="fa-regular fa-heart"></i></div>
+                                                <div class="mt-4 text-sm font-semibold uppercase tracking-[0.32em]">Reflection</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div id="active-card-panel" class="{{ $room->status === 'playing' && $room->currentCard ? 'rounded-[2.6rem] border border-violet-200/80 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.96),_rgba(249,250,255,0.92)),linear-gradient(180deg,_#ffffff_0%,_#f7f8ff_100%)] p-5 text-slate-900 shadow-[0_28px_80px_rgba(129,140,248,0.22)] sm:p-6 lg:p-8 xl:p-10' : 'rounded-[2.6rem] border border-dashed border-slate-300 bg-slate-50 p-5 text-slate-900 sm:p-6 lg:p-8 xl:p-10' }}">
-                                    @if ($room->status === 'playing' && $room->currentCard)
-                                        <div id="active-card-order" class="mx-auto w-max rounded-full bg-violet-50 px-5 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-violet-700"></div>
-                                        <div class="mt-8 text-center">
-                                            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-[1.4rem] bg-gradient-to-br from-violet-50 to-indigo-50 text-2xl text-violet-600 shadow-sm sm:h-16 sm:w-16">
-                                                <i class="fa-regular fa-heart"></i>
+                                @php
+                                    $isPlaying = $room->status === 'playing' && $room->currentCard;
+                                    $cardState = $isPlaying ? 'state-playing' : ($room->status === 'finished' ? 'state-finished' : 'state-waiting');
+                                    $cardIcon = $isPlaying ? 'fa-regular fa-heart' : ($room->status === 'finished' ? 'fa-solid fa-circle-check' : 'fa-regular fa-hourglass-half');
+                                    $cardTitle = $isPlaying ? $room->currentCard->title : ($room->status === 'finished' ? 'Sesi telah selesai' : 'Ruang tunggu aktif');
+                                    $cardQuestion = $isPlaying
+                                        ? $room->currentCard->question
+                                        : ($room->status === 'finished'
+                                            ? 'Room ini sudah diakhiri, tetapi kamu masih bisa membuka kembali halaman ini untuk melihat kartu terakhir, peserta, dan riwayat percakapan.'
+                                            : 'Peserta bisa bergabung menggunakan kode room ini. Host dapat menyalakan mode anonymous dan mulai game saat semua siap.');
+                                @endphp
+
+                                <div id="active-card-panel" class="{{ $cardState }} p-6 text-slate-900 sm:p-8 lg:p-10 xl:p-12">
+                                    <div class="card-aura"></div>
+                                    <div class="card-accent-bar"></div>
+                                    <div class="card-watermark"><i class="fa-solid fa-heart"></i></div>
+                                    <div class="card-shine"></div>
+
+                                    <div id="card-content">
+                                        <div class="text-center">
+                                            <span class="card-order-pill mx-auto w-max rounded-full px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em]">
+                                                <span class="dot"></span> Sedang berlangsung
+                                            </span>
+                                        </div>
+                                        <div class="mt-6 text-center">
+                                            <div id="active-card-icon" class="mx-auto flex h-16 w-16 items-center justify-center rounded-[1.5rem] text-2xl sm:h-20 sm:w-20 sm:text-3xl">
+                                                <i class="{{ $cardIcon }}"></i>
                                             </div>
-                                            <h3 id="active-card-title" class="mt-6 text-3xl font-bold tracking-tight sm:text-4xl">{{ $room->currentCard->title }}</h3>
+                                            <h3 id="active-card-title" class="mt-6 text-3xl font-bold tracking-tight sm:text-4xl">{{ $cardTitle }}</h3>
                                         </div>
-                                        <div class="mx-auto mt-8 max-w-3xl rounded-[2rem] border border-slate-100 bg-white/85 px-5 py-6 shadow-inner sm:px-6 sm:py-8 lg:px-8 lg:py-10">
-                                            <p id="active-card-question" class="text-center text-lg leading-9 text-slate-600 sm:text-xl sm:leading-[2.35rem] lg:text-[1.9rem] lg:leading-[3.2rem]">{{ $room->currentCard->question }}</p>
+                                        <div class="card-question-box mx-auto mt-8 max-w-3xl rounded-[2rem] px-5 py-6 sm:px-8 sm:py-8 lg:py-10">
+                                            <p id="active-card-question" class="text-center text-lg leading-9 text-slate-600 sm:text-xl sm:leading-[2.35rem] lg:text-[1.85rem] lg:leading-[3.1rem]">{{ $cardQuestion }}</p>
                                         </div>
-                                        <div class="mt-8 flex justify-center">
-                                            <div class="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-600">
+                                        <div id="active-card-footer" class="mt-8 flex justify-center">
+                                            <div class="card-footer-chip inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold">
                                                 <i class="fa-regular fa-heart mr-2"></i>Bagikan dengan tenang
                                             </div>
                                         </div>
-                                    @else
-                                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-[1.6rem] bg-slate-100 text-2xl text-slate-500">
-                                            <i class="fa-regular fa-hourglass-half"></i>
-                                        </div>
-                                        <h3 id="active-card-title" class="mt-6 text-center text-3xl font-bold text-slate-900">{{ $room->status === 'finished' ? 'Sesi telah selesai' : 'Ruang tunggu aktif' }}</h3>
-                                        <p id="active-card-question" class="mx-auto mt-5 max-w-2xl text-center text-base leading-8 text-slate-600">
-                                            {{ $room->status === 'finished' ? 'Room ini sudah diakhiri, tetapi kamu masih bisa membuka kembali halaman ini untuk melihat kartu terakhir, peserta, dan riwayat percakapan.' : 'Peserta bisa bergabung menggunakan kode room ini. Host dapat menyalakan mode anonymous dan mulai game saat semua siap.' }}
-                                        </p>
-                                        <div id="active-card-order" class="hidden"></div>
-                                    @endif
+                                    </div>
                                 </div>
 
                                 <div class="relative hidden xl:block" data-deck-card="right">
-                                    <div class="absolute inset-6 rounded-[2.2rem] border border-blue-100 bg-[linear-gradient(180deg,_#d9e5ff_0%,_#abc4ff_100%)] opacity-70"></div>
-                                    <div class="relative flex h-[23rem] items-center justify-center rounded-[2.6rem] border border-blue-200/80 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.85),_rgba(255,255,255,0.08)),linear-gradient(180deg,_#b6cdfd_0%,_#82a8f8_100%)] shadow-[0_28px_50px_rgba(96,138,240,0.28)] rotate-[8deg]">
-                                        <div class="text-center text-white/90">
-                                            <div class="text-4xl"><i class="fa-regular fa-heart"></i></div>
-                                            <div class="mt-4 text-base font-semibold uppercase tracking-[0.28em]">Deep Talk</div>
+                                    <div class="deck-stack">
+                                        <div class="deck-layer play-card back-2"></div>
+                                        <div class="deck-layer play-card back-1"></div>
+                                        <div class="play-card">
+                                            <div class="card-frame"></div>
+                                            <span class="card-index tl"><i class="fa-solid fa-comments text-sm"></i><span class="mt-1 text-[0.6rem] tracking-[0.15em]">DT</span></span>
+                                            <span class="card-index br"><i class="fa-solid fa-comments text-sm"></i><span class="mt-1 text-[0.6rem] tracking-[0.15em]">DT</span></span>
+                                            <div class="relative flex h-full flex-col items-center justify-center text-white">
+                                                <div class="flex h-16 w-16 items-center justify-center rounded-[1.3rem] border border-white/40 bg-white/20 text-3xl shadow-inner backdrop-blur-sm"><i class="fa-solid fa-comments"></i></div>
+                                                <div class="mt-4 text-sm font-semibold uppercase tracking-[0.32em]">Deep Talk</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -479,27 +805,30 @@
             );
 
             const panel = $('#active-card-panel');
-            const orderEl = $('#active-card-order');
             const titleEl = $('#active-card-title');
             const questionEl = $('#active-card-question');
+            const iconEl = $('#active-card-icon i');
             const targetBadge = $('#target-badge');
             const cardsRemainingBadge = $('#cards-remaining-badge');
             const target = data.target_participant || null;
 
+            panel.removeClass('state-playing state-finished state-waiting');
+
             if (playing) {
-                panel.removeClass('border-dashed border-slate-300 bg-slate-50').addClass('border-violet-200/80 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.96),_rgba(249,250,255,0.92)),linear-gradient(180deg,_#ffffff_0%,_#f7f8ff_100%)] shadow-[0_28px_80px_rgba(129,140,248,0.22)]');
-                titleEl.text(data.current_card.title).removeClass('text-slate-900').addClass('text-slate-900');
-                questionEl.text(data.current_card.question).removeClass('text-slate-600').addClass('text-slate-600');
+                panel.addClass('state-playing');
+                iconEl.attr('class', 'fa-regular fa-heart');
+                titleEl.text(data.current_card.title);
+                questionEl.text(data.current_card.question);
             } else if (finished) {
-                panel.removeClass('border-violet-200/80 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.96),_rgba(249,250,255,0.92)),linear-gradient(180deg,_#ffffff_0%,_#f7f8ff_100%)] border-dashed border-slate-300 bg-slate-50').addClass('border-emerald-200 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(240,253,250,0.96))] shadow-[0_24px_70px_rgba(16,185,129,0.14)]');
-                orderEl.addClass('hidden').text('');
-                titleEl.text('Sesi telah selesai').removeClass('text-slate-900').addClass('text-slate-900');
-                questionEl.text('Room ini sudah diakhiri, tetapi kamu masih bisa membuka kembali halaman ini untuk melihat kartu terakhir, peserta, dan riwayat percakapan.').removeClass('text-slate-200').addClass('text-slate-600');
+                panel.addClass('state-finished');
+                iconEl.attr('class', 'fa-solid fa-circle-check');
+                titleEl.text('Sesi telah selesai');
+                questionEl.text('Room ini sudah diakhiri, tetapi kamu masih bisa membuka kembali halaman ini untuk melihat kartu terakhir, peserta, dan riwayat percakapan.');
             } else {
-                panel.removeClass('border-violet-200/80 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.96),_rgba(249,250,255,0.92)),linear-gradient(180deg,_#ffffff_0%,_#f7f8ff_100%)] shadow-[0_28px_80px_rgba(129,140,248,0.22)] border-emerald-200 bg-[linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(240,253,250,0.96))] shadow-[0_24px_70px_rgba(16,185,129,0.14)]').addClass('border-dashed border-slate-300 bg-slate-50');
-                orderEl.addClass('hidden').text('');
-                titleEl.text('Ruang tunggu aktif').removeClass('text-white').addClass('text-slate-900');
-                questionEl.text('Peserta bisa bergabung menggunakan kode room ini. Host dapat menyalakan mode anonymous dan mulai game saat semua siap.').removeClass('text-slate-200').addClass('text-slate-600');
+                panel.addClass('state-waiting');
+                iconEl.attr('class', 'fa-regular fa-hourglass-half');
+                titleEl.text('Ruang tunggu aktif');
+                questionEl.text('Peserta bisa bergabung menggunakan kode room ini. Host dapat menyalakan mode anonymous dan mulai game saat semua siap.');
             }
 
             if (target) {
@@ -533,9 +862,10 @@
                             </button>
                         `);
                     }
+                    panel.removeClass('state-playing').addClass('state-waiting');
+                    iconEl.attr('class', 'fa-solid fa-layer-group');
                     titleEl.text('Semua kartu sudah terbuka');
                     questionEl.text('Semua kartu pada deck ini sudah dibuka. Kamu bisa reset kartu untuk memulai putaran baru, atau akhiri sesi jika diskusi sudah selesai.');
-                    orderEl.addClass('hidden').text('');
                 } else {
                     shuffleButton.remove();
                     resetDeckButton.remove();
@@ -800,6 +1130,30 @@
                 ? '<i class="fa-solid fa-compress mr-2"></i>Tampilkan Info'
                 : '<i class="fa-solid fa-expand mr-2"></i>Fokus Kartu');
         });
+
+        // Interactive pointer tilt on the active card (desktop only)
+        (function() {
+            const cardPanel = document.getElementById('active-card-panel');
+            const cardContent = document.getElementById('card-content');
+
+            if (!cardPanel || !cardContent || !window.matchMedia('(pointer: fine)').matches) {
+                return;
+            }
+
+            cardPanel.addEventListener('pointermove', function(event) {
+                if (isAnimatingShuffle) {
+                    return;
+                }
+                const rect = cardPanel.getBoundingClientRect();
+                const px = (event.clientX - rect.left) / rect.width - 0.5;
+                const py = (event.clientY - rect.top) / rect.height - 0.5;
+                cardContent.style.transform = `rotateY(${px * 7}deg) rotateX(${-py * 7}deg)`;
+            });
+
+            cardPanel.addEventListener('pointerleave', function() {
+                cardContent.style.transform = '';
+            });
+        })();
 
         pollRoom();
         setInterval(pollRoom, 4000);

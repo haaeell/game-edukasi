@@ -53,10 +53,10 @@
 
 @section('body')
     <div class="min-h-screen bg-[#eef4fb]">
-        <div class="admin-shell flex min-h-screen gap-0 p-0 lg:gap-6 lg:p-5">
+        <div class="admin-shell flex min-h-screen">
             <div id="admin-sidebar-backdrop" class="fixed inset-0 z-40 hidden bg-slate-950/35 backdrop-blur-[2px] lg:hidden"></div>
 
-            <aside id="admin-sidebar" class="hidden h-[calc(100vh-1.5rem)] w-[280px] shrink-0 overflow-y-auto rounded-[2rem] border border-slate-800 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.2),_transparent_30%),linear-gradient(180deg,_#081227_0%,_#091833_100%)] text-white shadow-2xl lg:sticky lg:top-3 lg:flex lg:flex-col">
+            <aside id="admin-sidebar" class="hidden h-screen w-[280px] shrink-0 overflow-y-auto border-r border-slate-800 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.2),_transparent_30%),linear-gradient(180deg,_#081227_0%,_#091833_100%)] text-white shadow-2xl lg:sticky lg:top-0 lg:flex lg:flex-col">
                 <div class="p-7">
                     <div class="flex items-center gap-3" data-admin-brand>
                         <div class="icon-badge flex h-14 w-14 rounded-2xl bg-white/10 text-2xl shadow-lg shadow-blue-500/20">
@@ -98,7 +98,7 @@
                 </div>
             </aside>
 
-            <main class="glass-panel min-w-0 flex-1 rounded-none border-0 px-4 py-5 sm:px-6 lg:rounded-[2.2rem] lg:border lg:px-8">
+            <main class="glass-panel min-w-0 flex-1 rounded-none border-0 px-4 py-5 sm:px-6 lg:px-8">
                 <div class="mb-6 border-b border-slate-200/80 pb-5">
                     <div class="text-center">
                         <h1 class="text-3xl font-bold tracking-tight text-slate-900">@yield('page-title')</h1>
