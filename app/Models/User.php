@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,6 +23,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'address',
+        'photo',
+        'role',
+        'status',
     ];
 
     /**
@@ -45,5 +51,30 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function articles(): HasMany
+    {
+        return $this->hasMany(Article::class, 'created_by');
+    }
+
+    public function videos(): HasMany
+    {
+        return $this->hasMany(Video::class, 'created_by');
+    }
+
+    public function hostedRooms(): HasMany
+    {
+        return $this->hasMany(GameRoom::class, 'host_user_id');
+    }
+
+    public function roomParticipants(): HasMany
+    {
+        return $this->hasMany(GameRoomParticipant::class);
+    }
+
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(GameRoomInvitation::class, 'invited_by');
     }
 }
