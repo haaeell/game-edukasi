@@ -44,17 +44,17 @@
 
                         <div id="beranda" class="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
                             <div>
-                                <h1 class="mt-6 text-5xl font-bold leading-[1.08] tracking-tight text-slate-900">
+                                <h1 class="mt-6 text-3xl font-bold leading-[1.15] tracking-tight text-slate-900 sm:text-4xl sm:leading-[1.1] lg:text-5xl lg:leading-[1.08]">
                                     Ruang aman untuk
                                     <span class="text-blue-600">bertumbuh</span>
                                     dan menemukan solusi
                                 </h1>
-                                <p class="mt-5 max-w-xl text-base leading-8 text-slate-500">
+                                <p class="mt-5 max-w-xl text-sm leading-7 text-slate-500 sm:text-base sm:leading-8">
                                     RuangKonseling adalah platform konseling interaktif yang membantu kamu memahami diri, belajar bersama, dan berkembang lebih baik setiap hari.
                                 </p>
-                                <div class="mt-8 flex flex-wrap gap-3">
-                                    <a href="{{ route('register') }}" class="btn-primary">Mulai Sekarang</a>
-                                    <a href="#fitur" class="btn-secondary">Lihat Fitur</a>
+                                <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                                    <a href="{{ route('register') }}" class="btn-primary w-full sm:w-auto">Mulai Sekarang</a>
+                                    <a href="#fitur" class="btn-secondary w-full sm:w-auto">Lihat Fitur</a>
                                 </div>
                             </div>
 
@@ -63,37 +63,37 @@
                                 <div class="absolute -left-6 top-10 h-32 w-32 rounded-full bg-blue-200/40 blur-3xl"></div>
                                 <div class="absolute -right-6 bottom-6 h-40 w-40 rounded-full bg-violet-200/40 blur-3xl"></div>
 
-                                <div class="relative mx-auto max-w-xl px-6 py-10">
-                                    <div class="relative rounded-[2.5rem] border border-white/70 bg-gradient-to-b from-white to-[#eef3ff] p-8 shadow-xl">
-                                        <div class="flex items-end justify-center gap-8">
-                                            <div class="flex w-32 flex-col items-center">
-                                                <div class="relative flex h-32 w-28 items-center justify-center rounded-t-[2.4rem] rounded-b-xl bg-white text-4xl text-blue-600 shadow-md ring-1 ring-slate-100">
+                                <div class="relative mx-auto max-w-xl px-2 py-6 sm:px-6 sm:py-10">
+                                    <div class="relative rounded-[2rem] border border-white/70 bg-gradient-to-b from-white to-[#eef3ff] p-5 shadow-xl sm:rounded-[2.5rem] sm:p-8">
+                                        <div class="flex items-end justify-center gap-3 sm:gap-8">
+                                            <div class="flex w-20 flex-col items-center sm:w-32">
+                                                <div class="relative flex h-20 w-[4.5rem] items-center justify-center rounded-t-[1.6rem] rounded-b-lg bg-white text-2xl text-blue-600 shadow-md ring-1 ring-slate-100 sm:h-32 sm:w-28 sm:rounded-t-[2.4rem] sm:rounded-b-xl sm:text-4xl">
                                                     <i class="fa-solid fa-user-doctor"></i>
-                                                    <span class="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white shadow ring-2 ring-white"><i class="fa-solid fa-check"></i></span>
+                                                    <span class="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-[9px] text-white shadow ring-2 ring-white sm:h-6 sm:w-6 sm:text-[10px]"><i class="fa-solid fa-check"></i></span>
                                                 </div>
-                                                <div class="mt-3 h-24 w-full rounded-t-[1.75rem] bg-gradient-to-b from-[#2c4fa0] to-[#1b336f]"></div>
-                                                <span class="mt-3 text-xs font-semibold text-slate-500">Konselor</span>
+                                                <div class="mt-2 h-14 w-full rounded-t-[1.1rem] bg-gradient-to-b from-[#2c4fa0] to-[#1b336f] sm:mt-3 sm:h-24 sm:rounded-t-[1.75rem]"></div>
+                                                <span class="mt-2 text-[0.65rem] font-semibold text-slate-500 sm:mt-3 sm:text-xs">Konselor</span>
                                             </div>
 
-                                            <div class="mb-16 flex flex-col items-center gap-1.5 text-blue-400">
-                                                <span class="h-1.5 w-1.5 rounded-full bg-current"></span>
-                                                <span class="h-1.5 w-1.5 rounded-full bg-current opacity-70"></span>
-                                                <span class="h-1.5 w-1.5 rounded-full bg-current opacity-40"></span>
+                                            <div class="mb-10 flex flex-col items-center gap-1 text-blue-400 sm:mb-16 sm:gap-1.5">
+                                                <span class="h-1 w-1 rounded-full bg-current sm:h-1.5 sm:w-1.5"></span>
+                                                <span class="h-1 w-1 rounded-full bg-current opacity-70 sm:h-1.5 sm:w-1.5"></span>
+                                                <span class="h-1 w-1 rounded-full bg-current opacity-40 sm:h-1.5 sm:w-1.5"></span>
                                             </div>
 
-                                            <div class="flex w-32 flex-col items-center">
-                                                <div class="flex h-32 w-28 items-center justify-center rounded-t-[2.4rem] rounded-b-xl bg-white text-4xl text-slate-600 shadow-md ring-1 ring-slate-100">
+                                            <div class="flex w-20 flex-col items-center sm:w-32">
+                                                <div class="flex h-20 w-[4.5rem] items-center justify-center rounded-t-[1.6rem] rounded-b-lg bg-white text-2xl text-slate-600 shadow-md ring-1 ring-slate-100 sm:h-32 sm:w-28 sm:rounded-t-[2.4rem] sm:rounded-b-xl sm:text-4xl">
                                                     <i class="fa-solid fa-user"></i>
                                                 </div>
-                                                <div class="mt-3 h-24 w-full rounded-t-[1.75rem] bg-gradient-to-b from-[#5b7ce0] to-[#3f5fc7]"></div>
-                                                <span class="mt-3 text-xs font-semibold text-slate-500">Kamu</span>
+                                                <div class="mt-2 h-14 w-full rounded-t-[1.1rem] bg-gradient-to-b from-[#5b7ce0] to-[#3f5fc7] sm:mt-3 sm:h-24 sm:rounded-t-[1.75rem]"></div>
+                                                <span class="mt-2 text-[0.65rem] font-semibold text-slate-500 sm:mt-3 sm:text-xs">Kamu</span>
                                             </div>
                                         </div>
 
-                                        <div class="mt-6 flex items-center justify-center gap-3">
-                                            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-lg text-blue-600 shadow-sm"><i class="fa-solid fa-heart"></i></span>
-                                            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-lg text-slate-500 shadow-sm"><i class="fa-regular fa-comment-dots"></i></span>
-                                            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-lg text-emerald-600 shadow-sm"><i class="fa-solid fa-shield-heart"></i></span>
+                                        <div class="mt-4 flex items-center justify-center gap-2 sm:mt-6 sm:gap-3">
+                                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-base text-blue-600 shadow-sm sm:h-10 sm:w-10 sm:text-lg"><i class="fa-solid fa-heart"></i></span>
+                                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-base text-slate-500 shadow-sm sm:h-10 sm:w-10 sm:text-lg"><i class="fa-regular fa-comment-dots"></i></span>
+                                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-base text-emerald-600 shadow-sm sm:h-10 sm:w-10 sm:text-lg"><i class="fa-solid fa-shield-heart"></i></span>
                                         </div>
 
                                         <div class="absolute -left-3 top-8 hidden items-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-xs font-semibold text-slate-600 shadow-lg sm:flex">
@@ -204,7 +204,7 @@
                                 <a href="#fitur" class="btn-secondary">Lihat Fitur</a>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             @foreach ([
                                 ['title' => 'Misi', 'desc' => 'Membantu setiap individu memahami diri dan berkembang lewat konseling interaktif.', 'icon' => 'fa-solid fa-bullseye'],
                                 ['title' => 'Visi', 'desc' => 'Menjadi ruang belajar dan konseling terpercaya untuk pelajar Indonesia.', 'icon' => 'fa-solid fa-eye'],

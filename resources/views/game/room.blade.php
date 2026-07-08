@@ -1156,6 +1156,6 @@
         })();
 
         pollRoom();
-        setInterval(pollRoom, 4000);
+        setInterval(pollRoom, 1500);
     </script>
 @endpush
