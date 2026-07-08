@@ -22,11 +22,6 @@
             </div>
 
             <div>
-                <label class="label" for="duration_seconds">Durasi Khusus per Kartu</label>
-                <input id="duration_seconds" name="duration_seconds" type="number" value="{{ old('duration_seconds', $card->duration_seconds ?? '') }}" class="field" min="1">
-            </div>
-
-            <div>
                 <label class="label" for="status">Status</label>
                 <select id="status" name="status" class="field">
                     @foreach (['active', 'inactive'] as $status)

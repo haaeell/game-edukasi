@@ -24,7 +24,7 @@
                             <div class="text-sm font-semibold text-sky-700">Urutan {{ $card->order_number }}</div>
                             <h3 class="mt-2 text-lg font-bold text-slate-900">{{ $card->title }}</h3>
                             <p class="mt-3 text-sm leading-7 text-slate-600">{{ $card->question }}</p>
-                            <div class="mt-3 text-xs text-slate-500">Durasi: {{ $card->duration_seconds ?? '-' }} detik • Status: {{ $card->status }}</div>
+                            <div class="mt-3 text-xs text-slate-500">Status: {{ $card->status }}</div>
                         </div>
 
                         <div class="flex flex-wrap gap-2">

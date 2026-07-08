@@ -17,7 +17,6 @@ class StoreGameCardRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'question' => ['required', 'string'],
-            'duration_seconds' => ['nullable', 'integer', 'min:1'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ];
     }

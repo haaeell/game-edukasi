@@ -143,12 +143,12 @@
                             ['title' => 'Video Inspiratif', 'desc' => 'Tonton video edukasi dan motivasi untuk mendukung kesehatan mentalmu.', 'accent' => 'bg-violet-50 text-violet-700', 'cta' => 'Jelajahi Video'],
                             ['title' => 'Game Edukasi', 'desc' => 'Mainkan game edukasi yang menyenangkan dan membantu pengembangan diri.', 'accent' => 'bg-emerald-50 text-emerald-700', 'cta' => 'Mulai Bermain'],
                         ] as $feature)
-                            <div class="metric-card p-6">
+                            <a href="{{ route('register') }}" class="metric-card block p-6 transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg">
                                 <div class="flex h-14 w-14 items-center justify-center rounded-2xl {{ $feature['accent'] }} text-2xl"><i class="fa-regular fa-compass"></i></div>
                                 <h3 class="mt-5 text-2xl font-bold text-slate-900">{{ $feature['title'] }}</h3>
                                 <p class="mt-3 text-sm leading-7 text-slate-500">{{ $feature['desc'] }}</p>
                                 <div class="mt-6 text-sm font-semibold text-blue-600">{{ $feature['cta'] }} →</div>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
                 </section>
