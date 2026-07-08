@@ -35,9 +35,27 @@
                     @error('phone')<p class="mt-1 text-sm text-rose-600">{{ $message }}</p>@enderror
                 </div>
 
-                <div>
-                    <label class="label" for="photo">Foto Profil</label>
-                    <input id="photo" name="photo" type="file" class="field">
+                <div class="md:col-span-2">
+                    <label class="label">Foto Profil</label>
+                    <div class="flex items-center gap-5">
+                        <div class="relative shrink-0">
+                            <div id="photoPreviewWrapper" class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-slate-200 bg-slate-50 text-3xl text-slate-300">
+                                <i class="fa-solid fa-user" id="photoPlaceholderIcon"></i>
+                                <img id="photoPreviewImg" src="" alt="Preview foto profil" class="hidden h-full w-full object-cover">
+                            </div>
+                            <label for="photo" class="absolute -bottom-1 -right-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-white shadow-md ring-4 ring-white transition hover:bg-blue-700">
+                                <i class="fa-solid fa-camera text-sm"></i>
+                            </label>
+                        </div>
+                        <div>
+                            <label for="photo" class="btn-secondary cursor-pointer">
+                                <i class="fa-solid fa-upload mr-2"></i> Unggah Foto
+                            </label>
+                            <p class="mt-2 text-xs text-slate-500">Format JPG atau PNG, maks. 2MB.</p>
+                            <p id="photoFileName" class="mt-1 truncate text-xs font-semibold text-blue-600"></p>
+                        </div>
+                    </div>
+                    <input id="photo" name="photo" type="file" accept="image/*" class="hidden">
                     @error('photo')<p class="mt-1 text-sm text-rose-600">{{ $message }}</p>@enderror
                 </div>
 
@@ -74,3 +92,32 @@
         </section>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        const photoInput = document.getElementById('photo');
+        const photoPreviewImg = document.getElementById('photoPreviewImg');
+        const photoPlaceholderIcon = document.getElementById('photoPlaceholderIcon');
+        const photoFileName = document.getElementById('photoFileName');
+
+        if (photoInput) {
+            photoInput.addEventListener('change', () => {
+                const file = photoInput.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+                photoFileName.textContent = file.name;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    photoPreviewImg.src = event.target.result;
+                    photoPreviewImg.classList.remove('hidden');
+                    photoPlaceholderIcon.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+@endpush

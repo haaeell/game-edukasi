@@ -198,14 +198,13 @@
                 <div class="panel overflow-hidden p-6">
                     <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                         <div>
-                            <div class="text-sm font-semibold uppercase tracking-[0.25em] text-blue-700">Ruang Refleksi</div>
                             <h1 class="mt-3 text-3xl font-bold text-slate-900">{{ $room->title }}</h1>
-                            <p class="mt-2 text-sm text-slate-500">Kode {{ $room->code }} • {{ $room->cardSet->title }} • {{ ucfirst($room->card_flow_type) }}</p>
+                            <p class="mt-2 text-sm text-slate-500">Kode {{ $room->code }} • {{ $room->cardSet->title }}</p>
                         </div>
 
                         <div class="flex flex-wrap gap-3">
                             @if ($participant->is_host && $room->status === 'waiting')
-                                <button type="button" class="btn-primary js-room-action" data-url="{{ route('game.rooms.start', $room->code) }}">Start Game</button>
+                                <button type="button" class="btn-primary js-room-action js-start-session-button" data-url="{{ route('game.rooms.start', $room->code) }}">Start Game</button>
                             @endif
                             <button type="button" id="room-focus-toggle" class="btn-secondary">
                                 <i class="fa-solid fa-expand mr-2"></i>Fokus Kartu
@@ -244,15 +243,38 @@
 
                             <div class="mt-5">
                                 <div class="text-sm font-semibold text-slate-700">Peserta ({{ $room->participants->count() }})</div>
-                                <div id="participants-box" class="mt-4 space-y-3">
+                                <div id="participants-box" class="mt-4 space-y-2.5">
+                                    @php
+                                        $avatarPalette = [
+                                            'from-blue-500 to-indigo-600',
+                                            'from-violet-500 to-purple-600',
+                                            'from-emerald-500 to-teal-600',
+                                            'from-amber-500 to-orange-600',
+                                            'from-pink-500 to-rose-600',
+                                        ];
+                                    @endphp
                                     @foreach ($room->participants as $item)
-                                        <div class="flex items-center justify-between rounded-2xl border border-slate-200 px-3 py-3">
-                                            <div>
-                                                <div class="text-sm font-semibold text-slate-900">{{ $item->public_name }}</div>
-                                                <div class="mt-1 text-xs uppercase tracking-[0.2em] text-slate-500">{{ $item->participant_type }} • {{ $item->status }}</div>
+                                        @php
+                                            $initial = strtoupper(mb_substr($item->public_name, 0, 1));
+                                            $avatarColor = $avatarPalette[ord($initial ?: 'A') % count($avatarPalette)];
+                                        @endphp
+                                        <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 transition hover:border-blue-200 hover:shadow-sm">
+                                            <div class="relative shrink-0">
+                                                @if ($item->photo_url)
+                                                    <img src="{{ $item->photo_url }}" alt="{{ $item->public_name }}" class="h-11 w-11 rounded-full object-cover shadow-sm ring-2 ring-white">
+                                                @else
+                                                    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br {{ $avatarColor }} text-sm font-bold text-white shadow-sm ring-2 ring-white">{{ $initial }}</div>
+                                                @endif
+                                                @if ($item->status === 'active')
+                                                    <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span>
+                                                @endif
+                                            </div>
+                                            <div class="min-w-0 flex-1">
+                                                <div class="truncate text-sm font-semibold text-slate-900">{{ $item->public_name }}</div>
+                                                <div class="mt-0.5 text-xs text-slate-500">{{ $item->participant_type === 'registered' ? 'Terdaftar' : 'Tamu' }}</div>
                                             </div>
                                             @if ($item->is_host)
-                                                <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">Host</span>
+                                                <span class="shrink-0 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">Host</span>
                                             @endif
                                         </div>
                                     @endforeach
@@ -365,7 +387,7 @@
                             @if ($participant->is_host)
                                 <div class="mt-8 grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
                                     @if ($room->status === 'waiting')
-                                        <button type="button" class="btn-primary js-room-action" data-url="{{ route('game.rooms.start', $room->code) }}">Mulai Sesi</button>
+                                        <button type="button" class="btn-primary js-room-action js-start-session-button" data-url="{{ route('game.rooms.start', $room->code) }}">Mulai Sesi</button>
                                     @endif
                                     @if ($room->status === 'playing' && max($room->cardSet->cards->where('status', 'active')->count() - count($room->opened_card_ids ?? []), 0) > 0)
                                         <button type="button" id="shuffle-card-button" class="btn-primary js-room-action" data-url="{{ route('game.rooms.shuffle', $room->code) }}">
@@ -442,6 +464,11 @@
         function renderStatus(data) {
             const playing = data.status === 'playing' && data.current_card;
             const finished = data.status === 'finished';
+
+            if (data.status !== 'waiting') {
+                $('.js-start-session-button').remove();
+            }
+
             $('#room-status-title').text(playing ? 'Kartu Aktif' : (finished ? 'Sesi Selesai' : 'Waiting Room'));
             $('#room-status-text').text(
                 playing
@@ -557,16 +584,36 @@
             }, 720);
         }
 
+        const avatarPalette = [
+            'from-blue-500 to-indigo-600',
+            'from-violet-500 to-purple-600',
+            'from-emerald-500 to-teal-600',
+            'from-amber-500 to-orange-600',
+            'from-pink-500 to-rose-600',
+        ];
+
         function renderParticipants(data) {
-            const html = data.participants.map((participant) => `
-                <div class="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-4">
-                    <div>
-                        <div class="font-semibold text-slate-900">${escapeHtml(participant.name)}</div>
-                        <div class="mt-1 text-xs uppercase tracking-[0.2em] text-slate-500">${escapeHtml(participant.type)} • ${escapeHtml(participant.status)}</div>
+            const html = data.participants.map((participant) => {
+                const initial = (participant.name || '?').trim().charAt(0).toUpperCase() || '?';
+                const avatarColor = avatarPalette[initial.charCodeAt(0) % avatarPalette.length];
+                const avatar = participant.photo_url
+                    ? `<img src="${escapeHtml(participant.photo_url)}" alt="${escapeHtml(participant.name)}" class="h-11 w-11 rounded-full object-cover shadow-sm ring-2 ring-white">`
+                    : `<div class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor} text-sm font-bold text-white shadow-sm ring-2 ring-white">${escapeHtml(initial)}</div>`;
+
+                return `
+                    <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2.5 transition hover:border-blue-200 hover:shadow-sm">
+                        <div class="relative shrink-0">
+                            ${avatar}
+                            ${participant.status === 'active' ? '<span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span>' : ''}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="truncate text-sm font-semibold text-slate-900">${escapeHtml(participant.name)}</div>
+                            <div class="mt-0.5 text-xs text-slate-500">${participant.type === 'registered' ? 'Terdaftar' : 'Tamu'}</div>
+                        </div>
+                        ${participant.is_host ? '<span class="shrink-0 rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">Host</span>' : ''}
                     </div>
-                    ${participant.is_host ? '<span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">Host</span>' : ''}
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             $('#participants-box').html(html || '<p class="text-sm text-slate-500">Belum ada peserta.</p>');
         }

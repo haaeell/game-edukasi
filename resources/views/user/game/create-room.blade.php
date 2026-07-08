@@ -3,7 +3,7 @@
 @section('content')
     <div class="panel mx-auto max-w-4xl p-8">
         <h1 class="text-3xl font-bold text-slate-900">Buat Room Game</h1>
-        <p class="mt-2 text-sm text-slate-500">Host memilih card set, mode kartu, dan aturan guest sebelum memulai permainan.</p>
+        <p class="mt-2 text-sm text-slate-500">Host memilih card set dan aturan guest sebelum memulai permainan. Perpindahan kartu dilakukan manual oleh host.</p>
 
         <form action="{{ route('user.game.store') }}" method="POST" class="mt-8 grid gap-5 md:grid-cols-2">
             @csrf
@@ -23,20 +23,6 @@
                     @endforeach
                 </select>
                 @error('game_card_set_id')<p class="mt-1 text-sm text-rose-600">{{ $message }}</p>@enderror
-            </div>
-
-            <div>
-                <label class="label" for="card_flow_type">Mode Perpindahan Kartu</label>
-                <select id="card_flow_type" name="card_flow_type" class="field" required>
-                    <option value="manual" @selected(old('card_flow_type') === 'manual')>Manual</option>
-                    <option value="automatic" @selected(old('card_flow_type') === 'automatic')>Automatic</option>
-                </select>
-            </div>
-
-            <div id="auto-next-wrapper">
-                <label class="label" for="auto_next_seconds">Durasi Default per Kartu</label>
-                <input id="auto_next_seconds" name="auto_next_seconds" type="number" min="5" value="{{ old('auto_next_seconds', 60) }}" class="field">
-                @error('auto_next_seconds')<p class="mt-1 text-sm text-rose-600">{{ $message }}</p>@enderror
             </div>
 
             <div class="flex items-center gap-3 pt-8">
@@ -84,15 +70,3 @@
         </form>
     </div>
 @endsection
-
-@push('scripts')
-    <script>
-        function toggleAutoNextField() {
-            const isAutomatic = $('#card_flow_type').val() === 'automatic';
-            $('#auto-next-wrapper').toggle(isAutomatic);
-        }
-
-        $('#card_flow_type').on('change', toggleAutoNextField);
-        toggleAutoNextField();
-    </script>
-@endpush

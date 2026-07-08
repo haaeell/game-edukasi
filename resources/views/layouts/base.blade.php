@@ -24,6 +24,10 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
     @stack('styles')
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
         :root {
             --navy-950: #081227;
             --navy-900: #0d1b38;

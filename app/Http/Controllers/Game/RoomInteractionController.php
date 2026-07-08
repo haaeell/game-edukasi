@@ -106,16 +106,15 @@ class RoomInteractionController extends Controller
 
         abort_unless($participant, 403);
 
-        if ($room->status === 'playing' && $room->card_flow_type === 'automatic') {
-            $room = $this->gameRoomService->advanceAutomaticRoomIfNeeded($room);
-        }
-
         return response()->json($this->gameRoomService->buildStatusPayload($room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant']), $participant));
     }
 
     public function participants(Request $request, string $code): JsonResponse
     {
-        $room = GameRoom::with(['participants' => fn ($query) => $query->where('status', 'active')->orderByDesc('is_host')->orderBy('display_name')])
+        $room = GameRoom::with([
+            'participants' => fn ($query) => $query->where('status', 'active')->orderByDesc('is_host')->orderBy('display_name'),
+            'participants.user',
+        ])
             ->where('code', strtoupper($code))
             ->firstOrFail();
 
@@ -128,6 +127,7 @@ class RoomInteractionController extends Controller
                 'type' => $item->participant_type,
                 'is_host' => $item->is_host,
                 'status' => $item->status,
+                'photo_url' => $item->photo_url,
             ])->values(),
         ]);
     }

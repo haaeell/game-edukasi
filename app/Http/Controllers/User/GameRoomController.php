@@ -18,16 +18,7 @@ class GameRoomController extends Controller
 
     public function index(): View
     {
-        return view('user.game.index', [
-            'hostedRooms' => GameRoom::with(['cardSet', 'participants'])
-                ->where('host_user_id', auth()->id())
-                ->latest()
-                ->get(),
-            'joinedRooms' => GameRoom::with(['cardSet', 'participants'])
-                ->whereHas('participants', fn ($query) => $query->where('user_id', auth()->id())->where('status', 'active'))
-                ->latest()
-                ->get(),
-        ]);
+        return view('user.game.index');
     }
 
     public function create(): View
@@ -45,8 +36,8 @@ class GameRoomController extends Controller
             'host_user_id' => $request->user()->id,
             'game_card_set_id' => $data['game_card_set_id'],
             'title' => $data['title'],
-            'card_flow_type' => $data['card_flow_type'],
-            'auto_next_seconds' => $data['card_flow_type'] === 'automatic' ? ($data['auto_next_seconds'] ?? 60) : null,
+            'card_flow_type' => 'manual',
+            'auto_next_seconds' => null,
             'allow_guest' => (bool) ($data['allow_guest'] ?? false),
             'host_is_player' => (bool) ($data['host_is_player'] ?? true),
             'status' => 'waiting',

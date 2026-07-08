@@ -268,48 +268,17 @@ class GameRoomService
         return $room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant']);
     }
 
-    public function advanceAutomaticRoomIfNeeded(GameRoom $room): GameRoom
-    {
-        if ($room->status !== 'playing' || $room->card_flow_type !== 'automatic' || ! $room->current_card_started_at) {
-            return $room;
-        }
-
-        $room = $room->fresh(['currentCard', 'cardSet.cards']);
-        $seconds = $room->currentCard?->duration_seconds ?: $room->auto_next_seconds;
-
-        if (! $seconds) {
-            return $room;
-        }
-
-        $elapsed = $room->current_card_started_at->diffInSeconds(now());
-
-        if ($elapsed >= $seconds) {
-            return $this->moveToNextCard($room);
-        }
-
-        return $room;
-    }
-
     public function buildStatusPayload(GameRoom $room, ?GameRoomParticipant $viewer = null): array
     {
-        $remainingSeconds = null;
         $totalActiveCards = $room->cardSet->cards()->where('status', 'active')->count();
         $openedCardIds = collect($room->opened_card_ids ?? [])->map(fn ($id) => (int) $id)->filter()->values();
         $cardsRemaining = max($totalActiveCards - $openedCardIds->count(), 0);
-
-        if ($room->status === 'playing' && $room->card_flow_type === 'automatic' && $room->current_card_started_at) {
-            $seconds = $room->currentCard?->duration_seconds ?: $room->auto_next_seconds;
-            $elapsed = $room->current_card_started_at->diffInSeconds(now());
-            $remainingSeconds = max(0, (int) $seconds - $elapsed);
-        }
 
         return [
             'status' => $room->status,
             'title' => $room->title,
             'code' => $room->code,
-            'card_flow_type' => $room->card_flow_type,
             'current_card_order' => $room->current_card_order,
-            'remaining_seconds' => $remainingSeconds,
             'host_is_player' => $room->host_is_player,
             'opened_card_count' => $openedCardIds->count(),
             'cards_remaining' => $cardsRemaining,

@@ -126,6 +126,7 @@ class RoomAccessController extends Controller
             'currentCard',
             'currentTargetParticipant',
             'participants' => fn ($query) => $query->orderByDesc('is_host')->orderBy('display_name'),
+            'participants.user',
         ])->where('code', strtoupper($code))->firstOrFail();
 
         $participant = $this->gameRoomService->resolveParticipant($room, $request);

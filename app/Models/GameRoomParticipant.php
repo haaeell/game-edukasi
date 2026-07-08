@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class GameRoomParticipant extends Model
 {
@@ -54,5 +55,14 @@ class GameRoomParticipant extends Model
     public function getPublicNameAttribute(): string
     {
         return $this->display_name;
+    }
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if ($this->is_anonymous || ! $this->user?->photo) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->user->photo);
     }
 }
