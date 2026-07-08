@@ -409,6 +409,8 @@
             bottom: 5.5rem;
             z-index: 60;
             width: min(380px, calc(100vw - 1.5rem));
+            max-height: calc(100vh - 7rem);
+            max-height: calc(100dvh - 7rem);
             transform: translateY(18px);
             opacity: 0;
             pointer-events: none;
@@ -419,6 +421,17 @@
             transform: translateY(0);
             opacity: 1;
             pointer-events: auto;
+        }
+
+        .floating-chat-panel .panel {
+            display: flex;
+            flex-direction: column;
+            max-height: inherit;
+        }
+
+        #chat-box {
+            flex: 1 1 auto;
+            min-height: 0;
         }
 
         @media (min-width: 1024px) {
@@ -486,6 +499,26 @@
             .floating-chat-panel {
                 bottom: 5rem;
                 width: calc(100vw - 1.5rem);
+                max-height: calc(100vh - 6.5rem);
+                max-height: calc(100dvh - 6.5rem);
+            }
+        }
+
+        @media (max-width: 639px) {
+            .room-shell .panel.p-6 {
+                padding: 1.25rem !important;
+            }
+
+            #room-status-title {
+                font-size: 1.35rem !important;
+            }
+
+            .floating-chat-trigger span:not(#chat-notification-badge) {
+                display: none;
+            }
+
+            .floating-chat-trigger {
+                padding: 0.9rem;
             }
         }
     </style>
@@ -498,22 +531,22 @@
                 <div class="panel overflow-hidden p-6">
                     <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
                         <div>
-                            <h1 class="mt-3 text-3xl font-bold text-slate-900">{{ $room->title }}</h1>
+                            <h1 class="mt-3 text-2xl font-bold text-slate-900 sm:text-3xl">{{ $room->title }}</h1>
                             <p class="mt-2 text-sm text-slate-500">Kode {{ $room->code }} • {{ $room->cardSet->title }}</p>
                         </div>
 
-                        <div class="flex flex-wrap gap-3">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
                             @if ($participant->is_host && $room->status === 'waiting')
-                                <button type="button" class="btn-primary js-room-action js-start-session-button" data-url="{{ route('game.rooms.start', $room->code) }}">Start Game</button>
+                                <button type="button" class="btn-primary js-room-action js-start-session-button w-full sm:w-auto" data-url="{{ route('game.rooms.start', $room->code) }}">Start Game</button>
                             @endif
-                            <button type="button" id="room-focus-toggle" class="btn-secondary">
+                            <button type="button" id="room-focus-toggle" class="btn-secondary w-full sm:w-auto">
                                 <i class="fa-solid fa-expand mr-2"></i>Fokus Kartu
                             </button>
 
                             @auth
-                                <a href="{{ route('user.game.index') }}" class="btn-secondary">Kembali ke Game</a>
+                                <a href="{{ route('user.game.index') }}" class="btn-secondary w-full text-center sm:w-auto">Kembali ke Game</a>
                             @else
-                                <a href="{{ route('game.join') }}" class="btn-secondary">Join Room Lain</a>
+                                <a href="{{ route('game.join') }}" class="btn-secondary w-full text-center sm:w-auto">Join Room Lain</a>
                             @endauth
                         </div>
                     </div>
@@ -754,7 +787,7 @@
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
-                <div id="chat-box" class="h-[22rem] space-y-3 overflow-y-auto bg-slate-50 p-4"></div>
+                <div id="chat-box" class="max-h-[22rem] space-y-3 overflow-y-auto bg-slate-50 p-4"></div>
                 <div class="border-t border-slate-200 bg-white px-4 py-4">
                     <form id="chat-form" class="flex flex-col gap-3 sm:flex-row">
                         <input id="chat-message" name="message" class="field" placeholder="Tulis jawaban atau chat..." autocomplete="off" @disabled($room->status === 'finished')>

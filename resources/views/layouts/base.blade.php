@@ -126,6 +126,13 @@
             box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
         }
 
+        @media (max-width: 767px) {
+            /* iOS Safari auto-zooms the page when a focused input's font-size is below 16px. */
+            .field {
+                font-size: 16px;
+            }
+        }
+
         .label {
             display: block;
             margin-bottom: 0.5rem;
