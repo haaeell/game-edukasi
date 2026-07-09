@@ -1,7 +1,45 @@
 @extends('layouts.base')
 
+@section('title', (trim($__env->yieldContent('page-title')) ?: 'Admin').' — SoluShare')
+
 @push('styles')
     <style>
+        .admin-sidebar {
+            background:
+                radial-gradient(circle at top, rgba(33, 167, 246, 0.24), transparent 32%),
+                radial-gradient(circle at bottom right, rgba(104, 214, 76, 0.16), transparent 28%),
+                linear-gradient(180deg, #07192a 0%, #0b2940 52%, #10334d 100%);
+        }
+
+        .admin-nav-link {
+            color: rgba(240, 249, 255, 0.82);
+        }
+
+        .admin-nav-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .admin-nav-link.active {
+            background: linear-gradient(135deg, rgba(17, 142, 233, 0.96), rgba(79, 200, 62, 0.92));
+            color: #fff;
+            box-shadow: 0 18px 32px rgba(17, 142, 233, 0.22);
+        }
+
+        .admin-settings-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.04));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .admin-settings-card:hover {
+            border-color: rgba(104, 214, 76, 0.32);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.06));
+        }
+
+        .admin-profile-avatar {
+            background: linear-gradient(135deg, rgba(17, 142, 233, 0.14), rgba(104, 214, 76, 0.2));
+            color: #15517b;
+        }
+
         @media (max-width: 1023px) {
             #admin-sidebar {
                 position: fixed;
@@ -56,14 +94,14 @@
         <div class="admin-shell flex min-h-screen">
             <div id="admin-sidebar-backdrop" class="fixed inset-0 z-40 hidden bg-slate-950/35 backdrop-blur-[2px] lg:hidden"></div>
 
-            <aside id="admin-sidebar" class="hidden h-screen w-[280px] shrink-0 overflow-y-auto border-r border-slate-800 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.2),_transparent_30%),linear-gradient(180deg,_#081227_0%,_#091833_100%)] text-white shadow-2xl lg:sticky lg:top-0 lg:flex lg:flex-col">
+            <aside id="admin-sidebar" class="admin-sidebar hidden h-screen w-[280px] shrink-0 overflow-y-auto border-r border-white/10 text-white shadow-2xl lg:sticky lg:top-0 lg:flex lg:flex-col">
                 <div class="p-7">
                     <div class="flex items-center gap-3" data-admin-brand>
-                        <div class="icon-badge flex h-14 w-14 rounded-2xl bg-white/10 text-2xl shadow-lg shadow-blue-500/20">
-                            <i class="fa-regular fa-heart text-white"></i>
+                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 p-2 shadow-lg shadow-blue-500/20">
+                            <img src="{{ asset('favicon-96.png') }}" alt="SoluShare" class="h-full w-full object-contain">
                         </div>
                         <div data-admin-brand-copy>
-                            <a href="{{ route('admin.dashboard') }}" class="block text-2xl font-bold tracking-tight">GameEdukasi</a>
+                            <a href="{{ route('admin.dashboard') }}" class="block text-2xl font-bold tracking-tight">SoluShare</a>
                             <p class="mt-1 text-sm text-blue-100/70">Platform admin interaktif</p>
                         </div>
                     </div>
@@ -72,37 +110,41 @@
                 <div class="px-7 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-100/45" data-admin-menu-label>Menu Utama</div>
 
                 <nav class="mt-5 flex-1 space-y-2 px-4 text-sm">
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-blue-50/80 hover:bg-white/8' }}" data-admin-nav-link>
+                    <a href="{{ route('admin.dashboard') }}" class="admin-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
                         <i class="fa-solid fa-house w-5 text-center"></i>
                         <span data-admin-nav-text>Dashboard</span>
                     </a>
-                    <a href="{{ route('admin.articles.index') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.articles.*') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-blue-50/80 hover:bg-white/8' }}" data-admin-nav-link>
+                    <a href="{{ route('admin.articles.index') }}" class="admin-nav-link {{ request()->routeIs('admin.articles.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
                         <i class="fa-regular fa-newspaper w-5 text-center"></i>
                         <span data-admin-nav-text>Articles</span>
                     </a>
-                    <a href="{{ route('admin.videos.index') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.videos.*') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-blue-50/80 hover:bg-white/8' }}" data-admin-nav-link>
+                    <a href="{{ route('admin.videos.index') }}" class="admin-nav-link {{ request()->routeIs('admin.videos.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
                         <i class="fa-regular fa-circle-play w-5 text-center"></i>
                         <span data-admin-nav-text>Videos</span>
                     </a>
-                    <a href="{{ route('admin.game-card-sets.index') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.game-card-sets.*', 'admin.game-cards.*') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-blue-50/80 hover:bg-white/8' }}" data-admin-nav-link>
+                    <a href="{{ route('admin.game-card-sets.index') }}" class="admin-nav-link {{ request()->routeIs('admin.game-card-sets.*', 'admin.game-cards.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
                         <i class="fa-regular fa-clone w-5 text-center"></i>
                         <span data-admin-nav-text>Card Sets</span>
                     </a>
-                    <a href="{{ route('admin.room-reports.index') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.room-reports.*') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-blue-50/80 hover:bg-white/8' }}" data-admin-nav-link>
+                    <a href="{{ route('admin.room-reports.index') }}" class="admin-nav-link {{ request()->routeIs('admin.room-reports.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
                         <i class="fa-regular fa-file-lines w-5 text-center"></i>
                         <span data-admin-nav-text>Laporan</span>
                     </a>
-                    <a href="{{ route('admin.peserta.index') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.peserta.*') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-blue-50/80 hover:bg-white/8' }}" data-admin-nav-link>
+                    <a href="{{ route('admin.peserta.index') }}" class="admin-nav-link {{ request()->routeIs('admin.peserta.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
                         <i class="fa-solid fa-users w-5 text-center"></i>
                         <span data-admin-nav-text>Peserta</span>
+                    </a>
+                    <a href="{{ route('admin.settings.account.edit') }}" class="admin-nav-link {{ request()->routeIs('admin.settings.account.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
+                        <i class="fa-solid fa-gear w-5 text-center"></i>
+                        <span data-admin-nav-text>Pengaturan Akun</span>
                     </a>
                 </nav>
 
                 <div class="mt-auto border-t border-white/10 p-5">
-                    <div class="rounded-2xl bg-white/5 p-4" data-admin-settings-card>
-                        <div class="text-sm font-semibold" data-admin-settings-title>Pengaturan</div>
-                        <div class="mt-1 text-xs text-blue-100/60" data-admin-settings-copy>Kelola platform, role, dan konfigurasi sistem.</div>
-                    </div>
+                    <a href="{{ route('admin.settings.account.edit') }}" class="admin-settings-card block rounded-2xl p-4 transition" data-admin-settings-card>
+                        <div class="text-sm font-semibold" data-admin-settings-title>Pengaturan Akun</div>
+                        <div class="mt-1 text-xs text-blue-100/60" data-admin-settings-copy>Ubah email login dan password admin kapan saja.</div>
+                    </a>
                 </div>
             </aside>
 
@@ -115,7 +157,7 @@
 
                     <div class="mt-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                         <div class="flex min-w-0 items-center gap-3">
-                            <button id="admin-sidebar-toggle" type="button" class="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-blue-300 hover:text-blue-600">
+                            <button id="admin-sidebar-toggle" type="button" class="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-sky-300 hover:text-sky-600">
                                 <i class="fa-solid fa-bars"></i>
                             </button>
                             <div class="relative min-w-0 flex-1 xl:w-[360px]">
@@ -134,7 +176,7 @@
 
                             <div class="relative" data-profile-dropdown>
                                 <button type="button" class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm" data-profile-trigger>
-                                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-100 to-blue-100 text-lg text-slate-700"><i class="fa-solid fa-user-tie"></i></div>
+                                    <div class="admin-profile-avatar flex h-12 w-12 items-center justify-center rounded-2xl text-lg"><i class="fa-solid fa-user-tie"></i></div>
                                     <div class="text-left text-sm">
                                         <div class="font-semibold text-slate-900">{{ auth()->user()->name }}</div>
                                         <div class="text-slate-500">Super Admin</div>
@@ -150,6 +192,10 @@
                                     <a href="{{ route('admin.game-card-sets.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900">
                                         <i class="fa-regular fa-clone w-4 text-center"></i>
                                         <span>Card Sets</span>
+                                    </a>
+                                    <a href="{{ route('admin.settings.account.edit') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900">
+                                        <i class="fa-solid fa-gear w-4 text-center"></i>
+                                        <span>Pengaturan Akun</span>
                                     </a>
                                     <div class="my-2 border-t border-slate-100"></div>
                                     <form action="{{ route('logout') }}" method="POST">

@@ -544,7 +544,7 @@
                             </button>
 
                             @auth
-                                <a href="{{ route('user.game.index') }}" class="btn-secondary w-full text-center sm:w-auto">Kembali ke Game</a>
+                                <a href="{{ route('user.game.index') }}" class="btn-secondary w-full text-center sm:w-auto">Kembali </a>
                             @else
                                 <a href="{{ route('game.join') }}" class="btn-secondary w-full text-center sm:w-auto">Join Room Lain</a>
                             @endauth
@@ -557,7 +557,7 @@
                         <div class="panel p-5">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <h2 class="text-xl font-bold text-blue-700">Ruang Konseling</h2>
+                                    <h2 class="text-xl font-bold text-blue-700">SoluShare</h2>
                                     <p class="mt-1 text-xs text-slate-500">Status peserta dan kontrol sesi</p>
                                 </div>
                                 <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{{ ucfirst($room->status) }}</span>

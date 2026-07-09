@@ -1,10 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Game Edukasi' }}</title>
+
+    <title>@yield('title', 'SoluShare — Ruang Belajar dan Konseling Interaktif')</title>
+    <meta name="description" content="@yield('meta_description', 'SoluShare adalah platform konseling dan edukasi interaktif untuk membantu kamu memahami diri, belajar bersama, dan bertumbuh lebih baik melalui artikel, video, dan game edukasi.')">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('favicon-512.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SoluShare">
+    <meta property="og:title" content="@yield('og_title', 'SoluShare — Ruang Belajar dan Konseling Interaktif')">
+    <meta property="og:description" content="@yield('og_description', 'Platform konseling dan edukasi interaktif untuk membantu kamu memahami diri, belajar bersama, dan bertumbuh lebih baik setiap hari.')">
+    <meta property="og:image" content="{{ asset('logo-header.png') }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('og_title', 'SoluShare — Ruang Belajar dan Konseling Interaktif')">
+    <meta name="twitter:description" content="@yield('og_description', 'Platform konseling dan edukasi interaktif untuk membantu kamu memahami diri, belajar bersama, dan bertumbuh lebih baik setiap hari.')">
+    <meta name="twitter:image" content="{{ asset('logo-header.png') }}">
+
+    <script type="application/ld+json">
+        {
+            "@@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "SoluShare",
+            "url": "{{ url('/') }}",
+            "logo": "{{ asset('logo-header.png') }}"
+        }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -29,11 +58,19 @@
         }
 
         :root {
-            --navy-950: #081227;
-            --navy-900: #0d1b38;
-            --brand-500: #3b82f6;
-            --brand-600: #2563eb;
-            --panel-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+            --navy-950: #07192a;
+            --navy-900: #0d2d46;
+            --brand-50: #f2fbff;
+            --brand-100: #d8f3ff;
+            --brand-200: #b7ebff;
+            --brand-400: #21a7f6;
+            --brand-500: #118ee9;
+            --brand-600: #0c74cf;
+            --accent-400: #68d64c;
+            --accent-500: #4fc83e;
+            --accent-600: #34aa37;
+            --ink-900: #143047;
+            --panel-shadow: 0 18px 50px rgba(12, 41, 64, 0.10);
         }
 
         body {
@@ -42,10 +79,10 @@
             overflow-x: hidden;
             font-family: 'Poppins', sans-serif;
             background:
-                radial-gradient(circle at top left, rgba(59, 130, 246, 0.08), transparent 22%),
-                radial-gradient(circle at right, rgba(14, 165, 233, 0.08), transparent 26%),
-                #eef4fb;
-            color: #1e293b;
+                radial-gradient(circle at top left, rgba(17, 142, 233, 0.12), transparent 24%),
+                radial-gradient(circle at right, rgba(79, 200, 62, 0.10), transparent 28%),
+                linear-gradient(180deg, #f5fdff 0%, #eef9ff 48%, #f4fff8 100%);
+            color: var(--ink-900);
         }
 
         .panel {
@@ -67,7 +104,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 1rem;
-            background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
+            background: linear-gradient(135deg, var(--brand-500), var(--accent-500));
             padding: 0.75rem 1rem;
             font-size: 0.875rem;
             font-weight: 600;
@@ -77,7 +114,7 @@
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.22);
+            box-shadow: 0 16px 30px rgba(17, 142, 233, 0.22);
         }
 
         .btn-secondary {
@@ -95,8 +132,9 @@
         }
 
         .btn-secondary:hover {
-            background: #f8fafc;
-            border-color: #93c5fd;
+            background: var(--brand-50);
+            border-color: rgba(17, 142, 233, 0.32);
+            color: var(--brand-600);
         }
 
         .btn-danger {
@@ -122,8 +160,8 @@
         }
 
         .field:focus {
-            border-color: #0ea5e9;
-            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+            border-color: var(--brand-500);
+            box-shadow: 0 0 0 4px rgba(17, 142, 233, 0.12);
         }
 
         @media (max-width: 767px) {
@@ -144,10 +182,10 @@
         .metric-card {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
-            border: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 252, 255, 0.98));
+            border: 1px solid #d9ebf3;
             border-radius: 1.5rem;
-            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+            box-shadow: 0 14px 32px rgba(9, 55, 88, 0.08);
         }
 
         .metric-card::before {
@@ -156,7 +194,7 @@
             inset: 0 auto auto 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.75), rgba(16, 185, 129, 0.75));
+            background: linear-gradient(90deg, rgba(17, 142, 233, 0.12), rgba(17, 142, 233, 0.82), rgba(79, 200, 62, 0.82));
         }
 
         .nav-chip {
@@ -165,13 +203,13 @@
         }
 
         .nav-chip:hover {
-            background: rgba(59, 130, 246, 0.08);
+            background: rgba(17, 142, 233, 0.08);
         }
 
         .nav-chip.active {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.14), rgba(96, 165, 250, 0.2));
-            color: #1d4ed8;
-            box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.12);
+            background: linear-gradient(135deg, rgba(17, 142, 233, 0.14), rgba(79, 200, 62, 0.18));
+            color: var(--brand-600);
+            box-shadow: inset 0 0 0 1px rgba(17, 142, 233, 0.14);
         }
 
         .icon-badge {

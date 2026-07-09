@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
+use App\Http\Controllers\Admin\AccountSettingsController as AdminAccountSettingsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GameCardController as AdminGameCardController;
 use App\Http\Controllers\Admin\GameCardSetController as AdminGameCardSetController;
@@ -41,6 +42,8 @@ Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function (): void {
         Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
+        Route::get('/settings/account', [AdminAccountSettingsController::class, 'edit'])->name('settings.account.edit');
+        Route::put('/settings/account', [AdminAccountSettingsController::class, 'update'])->name('settings.account.update');
         Route::resource('articles', AdminArticleController::class)->except('show');
         Route::resource('videos', AdminVideoController::class)->except('show');
         Route::resource('game-card-sets', AdminGameCardSetController::class);

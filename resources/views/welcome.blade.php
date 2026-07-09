@@ -1,5 +1,10 @@
 @extends('layouts.base')
 
+@section('title', 'SoluShare — Ruang Belajar dan Konseling Interaktif')
+@section('meta_description', 'SoluShare adalah platform konseling dan edukasi interaktif yang membantu kamu memahami diri, belajar bersama, dan berkembang lebih baik melalui artikel, video, dan game edukasi.')
+@section('og_title', 'SoluShare — Ruang Belajar dan Konseling Interaktif')
+@section('og_description', 'Bergabunglah dengan SoluShare untuk artikel, video, dan game edukasi yang mendukung kesehatan mental dan pengembangan dirimu.')
+
 @section('body')
     <div class="min-h-screen bg-[#eef4fb]">
         <div class="glass-panel min-h-screen overflow-hidden rounded-none border-0 p-4 sm:p-5 lg:p-6">
@@ -9,10 +14,8 @@
                         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                             <div class="flex items-center justify-between gap-3">
                                 <a href="{{ route('home') }}" class="flex items-center gap-3">
-                                    <div class="icon-badge flex h-12 w-12 rounded-2xl border border-blue-100 bg-white text-2xl text-blue-600 shadow-sm"><i class="fa-regular fa-heart"></i></div>
-                                    <div>
-                                        <div class="text-2xl font-bold tracking-tight text-slate-900">RuangKonseling</div>
-                                        <div class="text-sm text-slate-500">Platform Konseling</div>
+                                    <div class="flex h-12 items-center sm:h-14">
+                                        <img src="{{ asset('logo-header.png') }}" alt="SoluShare" class="h-10 w-auto object-contain sm:h-11">
                                     </div>
                                 </a>
 
@@ -50,7 +53,7 @@
                                     dan menemukan solusi
                                 </h1>
                                 <p class="mt-5 max-w-xl text-sm leading-7 text-slate-500 sm:text-base sm:leading-8">
-                                    RuangKonseling adalah platform konseling interaktif yang membantu kamu memahami diri, belajar bersama, dan berkembang lebih baik setiap hari.
+                                    SoluShare adalah platform konseling interaktif yang membantu kamu memahami diri, belajar bersama, dan berkembang lebih baik setiap hari.
                                 </p>
                                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                                     <a href="{{ route('register') }}" class="btn-primary w-full sm:w-auto">Mulai Sekarang</a>
@@ -155,7 +158,7 @@
 
                 <section id="siapa" class="panel p-6 lg:p-8">
                     <div class="text-center">
-                        <h2 class="text-3xl font-bold tracking-tight text-slate-900">Untuk Siapa RuangKonseling?</h2>
+                        <h2 class="text-3xl font-bold tracking-tight text-slate-900">Untuk Siapa SoluShare?</h2>
                         <p class="mt-3 text-sm text-slate-500">Dirancang untuk mendukung siapa pun yang ingin bertumbuh dan saling membantu.</p>
                     </div>
                     <div class="mt-8 grid gap-5 lg:grid-cols-3">
@@ -176,7 +179,7 @@
                 <section class="panel p-8 text-center">
                     <div class="mx-auto max-w-2xl">
                         <div class="text-5xl text-slate-300">“</div>
-                        <p class="mt-2 text-lg leading-8 text-slate-600">RuangKonseling membantuku memahami diri sendiri lebih dalam dan merasa tidak sendirian.</p>
+                        <p class="mt-2 text-lg leading-8 text-slate-600">SoluShare membantuku memahami diri sendiri lebih dalam dan merasa tidak sendirian.</p>
                         <div class="mt-8 flex items-center justify-center gap-4">
                             <div class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-orange-100 to-pink-100 text-lg text-slate-700"><i class="fa-solid fa-user"></i></div>
                             <div class="text-left">
@@ -195,9 +198,9 @@
                 <section id="tentang" class="panel overflow-hidden p-6 lg:p-8">
                     <div class="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-center">
                         <div>
-                            <h2 class="text-3xl font-bold tracking-tight text-slate-900">Tentang RuangKonseling</h2>
+                            <h2 class="text-3xl font-bold tracking-tight text-slate-900">Tentang SoluShare</h2>
                             <p class="mt-4 text-base leading-8 text-slate-500">
-                                RuangKonseling hadir sebagai ruang aman berbasis web untuk mendukung kesehatan mental dan pengembangan diri melalui artikel, video, dan game edukasi interaktif. Kami percaya setiap orang berhak mendapatkan akses ke wawasan dan dukungan yang membantu mereka bertumbuh, tanpa perlu merasa sendirian.
+                                SoluShare hadir sebagai ruang aman berbasis web untuk mendukung kesehatan mental dan pengembangan diri melalui artikel, video, dan game edukasi interaktif. Kami percaya setiap orang berhak mendapatkan akses ke wawasan dan dukungan yang membantu mereka bertumbuh, tanpa perlu merasa sendirian.
                             </p>
                             <div class="mt-6 flex flex-wrap gap-3">
                                 <a href="{{ route('register') }}" class="btn-primary">Gabung Sekarang</a>
@@ -253,8 +256,9 @@
                     <div class="grid gap-8 lg:grid-cols-[1.2fr_1fr_1fr_1fr]">
                         <div>
                             <div class="flex items-center gap-3">
-                                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-2xl"><i class="fa-regular fa-heart"></i></div>
-                                <div class="text-2xl font-bold">RuangKonseling</div>
+                                <div class="flex h-14 items-center rounded-2xl bg-white shadow-lg shadow-blue-950/10">
+                                    <img src="{{ asset('logo-header.png') }}" alt="SoluShare" class="h-11 w-auto object-contain">
+                                </div>
                             </div>
                             <p class="mt-4 max-w-sm text-sm leading-7 text-blue-100/80">Platform konseling interaktif untuk mendukung kesehatan mental dan pengembangan diri.</p>
                             <div class="mt-5 flex gap-3 text-lg text-blue-100/90">
@@ -288,7 +292,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-8 border-t border-white/10 pt-6 text-center text-sm text-blue-100/70">© 2024 RuangKonseling. All rights reserved.</div>
+                    <div class="mt-8 border-t border-white/10 pt-6 text-center text-sm text-blue-100/70">© {{ now()->year }} SoluShare. All rights reserved.</div>
                 </footer>
             </div>
         </div>

@@ -1,13 +1,14 @@
 @extends('layouts.base')
 
+@section('title', 'Masuk — SoluShare')
+
 @section('body')
     <div class="flex min-h-screen items-center justify-center bg-[#eef4fb] px-0 py-0 sm:px-4 sm:py-10">
         <section class="panel min-h-screen w-full max-w-md rounded-none border-0 p-6 sm:min-h-0 sm:rounded-[1.5rem] sm:border sm:p-8">
             <div class="flex items-center justify-center gap-3">
-                <div class="icon-badge flex h-12 w-12 rounded-2xl border border-blue-100 bg-white text-2xl text-blue-600 shadow-sm">
-                    <i class="fa-regular fa-heart"></i>
+                <div class="flex h-30 w-30 items-center justify-center ">
+                    <img src="{{ asset('logo-header.png') }}" alt="SoluShare" class="h-full w-full object-contain">
                 </div>
-                <div class="text-2xl font-bold tracking-tight text-slate-900">RuangKonseling</div>
             </div>
 
             <div class="mt-8 text-center">

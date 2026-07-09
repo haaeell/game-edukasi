@@ -148,7 +148,7 @@
 </head>
 <body>
     <div class="header">
-        <div class="brand">RuangKonseling &bull; Laporan Room</div>
+        <div class="brand">SoluShare &bull; Laporan Room</div>
         <h1>{{ $room->title }}</h1>
         <div class="meta">
             Kode Room: <strong>{{ $room->code }}</strong> &bull;
@@ -296,7 +296,7 @@
     @endif
 
     <div class="footer-note">
-        Laporan ini dibuat otomatis oleh sistem RuangKonseling pada {{ $generatedAt->format('d M Y H:i:s') }}.
+        Laporan ini dibuat otomatis oleh sistem SoluShare pada {{ $generatedAt->format('d M Y H:i:s') }}.
     </div>
 </body>
 </html>

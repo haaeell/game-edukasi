@@ -1,5 +1,7 @@
 @extends('layouts.base')
 
+@section('title', 'Dashboard — SoluShare')
+
 @section('body')
     <div class="min-h-screen bg-[#eef4fb]">
         <div class="glass-panel min-h-screen rounded-none border-0">
@@ -10,7 +12,9 @@
                 </div>
 
                 <div class="mt-6 flex items-center justify-between gap-3">
-                    <a href="{{ route('user.dashboard') }}" class="icon-badge flex h-12 w-12 shrink-0 rounded-2xl border border-blue-100 bg-white text-xl text-blue-600 shadow-sm md:h-14 md:w-14 md:text-2xl"><i class="fa-regular fa-heart"></i></a>
+                    <a href="{{ route('user.dashboard') }}" class="flex h-12 shrink-0 items-center  md:h-14">
+                        <img src="{{ asset('logo-header.png') }}" alt="SoluShare" class="h-10 w-auto object-contain md:h-11">
+                    </a>
 
                     <nav class="hidden min-w-0 items-center gap-2 md:flex">
                         <a href="{{ route('user.dashboard') }}" class="nav-chip px-4 py-3 text-sm font-semibold {{ request()->routeIs('user.dashboard') ? 'active' : 'text-slate-600' }}">Beranda</a>
