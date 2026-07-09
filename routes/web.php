@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\ArticleController as AdminArticleController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GameCardController as AdminGameCardController;
 use App\Http\Controllers\Admin\GameCardSetController as AdminGameCardSetController;
+use App\Http\Controllers\Admin\PesertaController as AdminPesertaController;
+use App\Http\Controllers\Admin\RoomReportController as AdminRoomReportController;
 use App\Http\Controllers\Admin\VideoController as AdminVideoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Game\RoomAccessController;
@@ -49,6 +51,12 @@ Route::prefix('admin')
         Route::delete('game-card-sets/{gameCardSet}/cards/{card}', [AdminGameCardController::class, 'destroy'])->name('game-cards.destroy');
         Route::post('game-card-sets/{gameCardSet}/cards/{card}/move-up', [AdminGameCardController::class, 'moveUp'])->name('game-cards.move-up');
         Route::post('game-card-sets/{gameCardSet}/cards/{card}/move-down', [AdminGameCardController::class, 'moveDown'])->name('game-cards.move-down');
+        Route::get('room-reports', [AdminRoomReportController::class, 'index'])->name('room-reports.index');
+        Route::get('room-reports/{gameRoom}', [AdminRoomReportController::class, 'show'])->name('room-reports.show');
+        Route::get('room-reports/{gameRoom}/pdf', [AdminRoomReportController::class, 'pdf'])->name('room-reports.pdf');
+        Route::get('peserta', [AdminPesertaController::class, 'index'])->name('peserta.index');
+        Route::get('peserta/{peserta}', [AdminPesertaController::class, 'show'])->name('peserta.show');
+        Route::post('peserta/{peserta}/toggle-status', [AdminPesertaController::class, 'toggleStatus'])->name('peserta.toggle-status');
     });
 
 Route::prefix('user')
@@ -83,3 +91,4 @@ Route::get('/game/room/{code}/status', [RoomInteractionController::class, 'statu
 Route::get('/game/room/{code}/participants', [RoomInteractionController::class, 'participants'])->name('game.rooms.participants');
 Route::get('/game/room/{code}/messages', [RoomInteractionController::class, 'messages'])->name('game.rooms.messages');
 Route::post('/game/room/{code}/messages', [RoomInteractionController::class, 'sendMessage'])->name('game.rooms.messages.store');
+Route::post('/game/room/{code}/feedback', [RoomInteractionController::class, 'submitFeedback'])->name('game.rooms.feedback');

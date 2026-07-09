@@ -112,6 +112,24 @@ class GameRoomService
             ->first();
     }
 
+    public function resolveParticipantIgnoringStatus(GameRoom $room, Request $request): ?GameRoomParticipant
+    {
+        if ($request->user()) {
+            return $room->participants()
+                ->where('user_id', $request->user()->id)
+                ->latest('id')
+                ->first();
+        }
+
+        $participantId = $request->session()->get($this->getGuestSessionKey($room));
+
+        if (! $participantId) {
+            return null;
+        }
+
+        return $room->participants()->whereKey($participantId)->first();
+    }
+
     public function startRoom(GameRoom $room): GameRoom
     {
         $firstCard = $room->cardSet->cards()

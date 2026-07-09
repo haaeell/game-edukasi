@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Game;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Game\InviteRoomRequest;
 use App\Http\Requests\Game\SendMessageRequest;
+use App\Http\Requests\Game\SubmitFeedbackRequest;
 use App\Mail\GameRoomInvitationMail;
 use App\Models\GameRoom;
+use App\Models\GameRoomFeedback;
 use App\Models\GameRoomInvitation;
 use App\Services\GameRoomService;
 use Illuminate\Http\JsonResponse;
@@ -104,9 +106,32 @@ class RoomInteractionController extends Controller
         $room = GameRoom::with(['currentCard', 'cardSet.cards', 'currentTargetParticipant'])->where('code', strtoupper($code))->firstOrFail();
         $participant = $this->gameRoomService->resolveParticipant($room, $request);
 
-        abort_unless($participant, 403);
+        if (! $participant) {
+            if ($room->status === 'finished') {
+                return response()->json(['finished' => true]);
+            }
+
+            abort(403);
+        }
 
         return response()->json($this->gameRoomService->buildStatusPayload($room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant']), $participant));
+    }
+
+    public function submitFeedback(SubmitFeedbackRequest $request, string $code): JsonResponse
+    {
+        $room = GameRoom::where('code', strtoupper($code))->firstOrFail();
+        $participant = $this->gameRoomService->resolveParticipantIgnoringStatus($room, $request);
+
+        abort_unless($participant, 403);
+
+        GameRoomFeedback::create([
+            'game_room_id' => $room->id,
+            'game_room_participant_id' => $participant->id,
+            'participant_name' => $participant->public_name,
+            'message' => $request->validated()['message'],
+        ]);
+
+        return response()->json(['message' => 'Terima kasih atas masukanmu.']);
     }
 
     public function participants(Request $request, string $code): JsonResponse

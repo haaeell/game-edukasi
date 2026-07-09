@@ -810,11 +810,13 @@
         const messagesUrl = @json(route('game.rooms.messages', $room->code));
         const sendMessageUrl = @json(route('game.rooms.messages.store', $room->code));
         const resetDeckUrl = @json(route('game.rooms.reset-deck', $room->code));
+        const feedbackUrl = @json(route('game.rooms.feedback', $room->code));
         const homeUrl = @json(route('home'));
         let isAnimatingShuffle = false;
         let latestTargetParticipantId = @json($room->current_target_participant_id);
         let unreadChatCount = 0;
         let lastMessageId = null;
+        let sessionEndHandled = false;
 
         function escapeHtml(text) {
             return $('<div>').text(text ?? '').html();
@@ -1030,23 +1032,66 @@
             $('#floating-chat-panel').removeClass('is-open');
         }
 
-        function leaveRoomToHome(message = 'Sesi telah selesai. Kamu dikembalikan ke halaman utama.') {
+        function showFeedbackThenLeave(message = 'Sesi telah selesai. Bagikan kritik dan saranmu sebelum keluar.') {
+            if (sessionEndHandled) {
+                return;
+            }
+
+            sessionEndHandled = true;
+
             Swal.fire({
                 icon: 'info',
-                title: 'Sesi Berakhir',
+                title: 'Sesi Telah Berakhir',
                 text: message,
-                confirmButtonColor: '#2563eb'
-            }).then(() => {
+                input: 'textarea',
+                inputPlaceholder: 'Tulis kritik dan saran kamu di sini...',
+                inputAttributes: {
+                    'aria-label': 'Kritik dan saran',
+                },
+                showDenyButton: true,
+                confirmButtonText: 'Kirim & Keluar',
+                denyButtonText: 'Lewati',
+                confirmButtonColor: '#2563eb',
+                denyButtonColor: '#64748b',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            }).then((result) => {
+                const feedbackMessage = (result.value || '').trim();
+
+                if (result.isConfirmed && feedbackMessage) {
+                    $.ajax({
+                        url: feedbackUrl,
+                        type: 'POST',
+                        data: {
+                            _token: window.csrfToken,
+                            message: feedbackMessage,
+                        }
+                    }).always(function() {
+                        window.location.href = homeUrl;
+                    });
+                    return;
+                }
+
                 window.location.href = homeUrl;
             });
         }
 
         function pollRoom() {
+            if (sessionEndHandled) {
+                return;
+            }
+
             $.get(statusUrl)
-                .done(renderStatus)
+                .done(function(data) {
+                    if (data.finished) {
+                        showFeedbackThenLeave();
+                        return;
+                    }
+                    renderStatus(data);
+                })
                 .fail(function(xhr) {
                     if (xhr.status === 403) {
-                        leaveRoomToHome();
+                        showFeedbackThenLeave();
                     }
                 });
 
@@ -1054,7 +1099,7 @@
                 .done(renderParticipants)
                 .fail(function(xhr) {
                     if (xhr.status === 403) {
-                        leaveRoomToHome();
+                        showFeedbackThenLeave();
                     }
                 });
 
@@ -1062,7 +1107,7 @@
                 .done(renderMessages)
                 .fail(function(xhr) {
                     if (xhr.status === 403) {
-                        leaveRoomToHome();
+                        showFeedbackThenLeave();
                     }
                 });
         }
@@ -1131,7 +1176,7 @@
                 }
             }).done(function(response) {
                 if (response.redirect_url) {
-                    leaveRoomToHome('Sesi telah diakhiri. Semua peserta keluar dari room.');
+                    showFeedbackThenLeave('Sesi telah diakhiri. Bagikan kritik dan saranmu sebelum keluar.');
                     return;
                 }
 

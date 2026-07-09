@@ -79,6 +79,11 @@ class GameRoom extends Model
         return $this->hasMany(GameRoomMessage::class);
     }
 
+    public function feedbacks(): HasMany
+    {
+        return $this->hasMany(GameRoomFeedback::class);
+    }
+
     public function activeParticipants(): HasMany
     {
         return $this->participants()->where('status', 'active');

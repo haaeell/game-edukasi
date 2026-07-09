@@ -88,6 +88,14 @@
                         <i class="fa-regular fa-clone w-5 text-center"></i>
                         <span data-admin-nav-text>Card Sets</span>
                     </a>
+                    <a href="{{ route('admin.room-reports.index') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.room-reports.*') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-blue-50/80 hover:bg-white/8' }}" data-admin-nav-link>
+                        <i class="fa-regular fa-file-lines w-5 text-center"></i>
+                        <span data-admin-nav-text>Laporan</span>
+                    </a>
+                    <a href="{{ route('admin.peserta.index') }}" class="flex items-center gap-3 rounded-2xl px-4 py-3 {{ request()->routeIs('admin.peserta.*') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25' : 'text-blue-50/80 hover:bg-white/8' }}" data-admin-nav-link>
+                        <i class="fa-solid fa-users w-5 text-center"></i>
+                        <span data-admin-nav-text>Peserta</span>
+                    </a>
                 </nav>
 
                 <div class="mt-auto border-t border-white/10 p-5">
