@@ -69,11 +69,11 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap gap-3">
-                            <button type="submit" class="btn-primary">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                            <button type="submit" class="btn-primary w-full sm:w-auto">
                                 <i class="fa-solid fa-floppy-disk mr-2"></i>Simpan Pengaturan
                             </button>
-                            <a href="{{ route('admin.dashboard') }}" class="btn-secondary">Kembali ke Dashboard</a>
+                            <a href="{{ route('admin.dashboard') }}" class="btn-secondary w-full sm:w-auto">Kembali ke Dashboard</a>
                         </div>
                     </form>
                 </div>

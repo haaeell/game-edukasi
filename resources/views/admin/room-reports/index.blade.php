@@ -27,21 +27,85 @@
                     <p class="mt-2 text-sm text-slate-500">Klik "Lihat Laporan" untuk detail lengkap peserta dan riwayat chat, atau unduh langsung sebagai PDF.</p>
                 </div>
 
-                <form action="{{ route('admin.room-reports.index') }}" method="GET" class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                    <input type="text" name="search" value="{{ $filters['search'] }}" placeholder="Cari judul atau kode room..." class="field sm:w-64">
-                    <select name="status" class="field sm:w-44" onchange="this.form.submit()">
+                <form action="{{ route('admin.room-reports.index') }}" method="GET" class="flex w-full flex-col gap-3 lg:w-auto sm:flex-row sm:items-center">
+                    <input type="text" name="search" value="{{ $filters['search'] }}" placeholder="Cari judul atau kode room..." class="field w-full sm:w-64">
+                    <select name="status" class="field w-full sm:w-44" onchange="this.form.submit()">
                         <option value="">Semua Status</option>
                         @foreach (['waiting' => 'Menunggu', 'playing' => 'Berlangsung', 'finished' => 'Selesai'] as $value => $label)
                             <option value="{{ $value }}" @selected($filters['status'] === $value)>{{ $label }}</option>
                         @endforeach
                     </select>
-                    <button type="submit" class="btn-secondary">
+                    <button type="submit" class="btn-secondary w-full sm:w-auto">
                         <i class="fa-solid fa-magnifying-glass mr-2"></i>Cari
                     </button>
                 </form>
             </div>
 
-            <div class="mt-6 overflow-x-auto">
+            <div class="mt-6 space-y-4 lg:hidden">
+                @forelse ($rooms as $room)
+                    @php
+                        $statusStyle = match ($room->status) {
+                            'playing' => 'bg-cyan-50 text-cyan-700',
+                            'finished' => 'bg-emerald-50 text-emerald-700',
+                            default => 'bg-amber-50 text-amber-700',
+                        };
+                        $statusLabel = match ($room->status) {
+                            'playing' => 'Berlangsung',
+                            'finished' => 'Selesai',
+                            default => 'Menunggu',
+                        };
+                    @endphp
+                    <div class="admin-mobile-card p-5">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <div class="truncate font-semibold text-slate-900">{{ $room->title }}</div>
+                                <div class="mt-1 text-xs uppercase tracking-[0.16em] text-slate-400">{{ $room->code }}</div>
+                            </div>
+                            <span class="rounded-full {{ $statusStyle }} px-3 py-1 text-xs font-semibold">{{ $statusLabel }}</span>
+                        </div>
+
+                        <div class="mt-4 space-y-3 text-sm">
+                            <div class="admin-detail-pair">
+                                <span class="admin-detail-pair-label">Host</span>
+                                <span class="admin-detail-pair-value">{{ $room->host->name ?? '-' }}</span>
+                            </div>
+                            <div class="admin-detail-pair">
+                                <span class="admin-detail-pair-label">Card Set</span>
+                                <span class="admin-detail-pair-value">{{ $room->cardSet->title ?? '-' }}</span>
+                            </div>
+                            <div class="admin-detail-pair">
+                                <span class="admin-detail-pair-label">Peserta</span>
+                                <span class="admin-detail-pair-value">{{ $room->participants_count }}</span>
+                            </div>
+                            <div class="admin-detail-pair">
+                                <span class="admin-detail-pair-label">Pesan</span>
+                                <span class="admin-detail-pair-value">{{ $room->messages_count }}</span>
+                            </div>
+                            <div class="admin-detail-pair">
+                                <span class="admin-detail-pair-label">Dibuat</span>
+                                <span class="admin-detail-pair-value">{{ $room->created_at->format('d M Y H:i') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 flex flex-col gap-2 sm:flex-row">
+                            <a href="{{ route('admin.room-reports.show', $room) }}" class="btn-secondary w-full">
+                                <i class="fa-regular fa-eye mr-2"></i>Lihat
+                            </a>
+                            <a href="{{ route('admin.room-reports.pdf', $room) }}" class="btn-primary w-full">
+                                <i class="fa-solid fa-file-pdf mr-2"></i>PDF
+                            </a>
+                        </div>
+                    </div>
+                @empty
+                    <div class="panel p-10 text-center">
+                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-2xl text-blue-600"><i class="fa-regular fa-file-lines"></i></div>
+                        <h3 class="mt-4 text-lg font-bold text-slate-900">Belum ada room</h3>
+                        <p class="mt-1 text-sm text-slate-500">Laporan akan muncul di sini setelah ada room game yang dibuat.</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <div class="mt-6 hidden overflow-x-auto lg:block">
                 <table class="w-full min-w-[900px] border-collapse text-left text-sm">
                     <thead>
                         <tr class="border-b border-slate-200 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">

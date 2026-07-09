@@ -40,6 +40,34 @@
             color: #15517b;
         }
 
+        .admin-mobile-card {
+            border-radius: 1.5rem;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 252, 0.98));
+            box-shadow: 0 14px 30px rgba(12, 41, 64, 0.06);
+        }
+
+        .admin-detail-pair {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .admin-detail-pair-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+        .admin-detail-pair-value {
+            min-width: 0;
+            text-align: right;
+            color: #334155;
+        }
+
         @media (max-width: 1023px) {
             #admin-sidebar {
                 position: fixed;
@@ -54,6 +82,21 @@
 
             #admin-sidebar.is-open {
                 transform: translateX(0);
+            }
+
+            .admin-mobile-hide {
+                display: none;
+            }
+        }
+
+        @media (max-width: 639px) {
+            .admin-detail-pair {
+                flex-direction: column;
+                gap: 0.35rem;
+            }
+
+            .admin-detail-pair-value {
+                text-align: left;
             }
         }
 
@@ -156,14 +199,14 @@
                     </div>
 
                     <div class="mt-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                        <div class="flex min-w-0 items-center gap-3">
+                        <div class="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
                             <button id="admin-sidebar-toggle" type="button" class="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-sky-300 hover:text-sky-600">
                                 <i class="fa-solid fa-bars"></i>
                             </button>
                             <div class="relative min-w-0 flex-1 xl:w-[360px]">
                                 <input id="admin-search-input" type="text" class="field h-12 pl-11 pr-24" placeholder="Cari sesuatu...">
                                 <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                <button id="admin-search-shortcut" type="button" class="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-500 transition hover:bg-slate-200">Ctrl K</button>
+                                <button id="admin-search-shortcut" type="button" class="admin-mobile-hide absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-500 transition hover:bg-slate-200">Ctrl K</button>
                                 <div id="admin-search-results" class="absolute left-0 right-0 top-[calc(100%+0.75rem)] z-30 hidden overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-2xl">
                                     <div class="border-b border-slate-100 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Quick Search</div>
                                     <div id="admin-search-results-list" class="max-h-80 overflow-y-auto py-2"></div>
@@ -172,19 +215,19 @@
                         </div>
 
                         <div class="flex flex-wrap items-center justify-end gap-3">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-lg text-slate-500 shadow-sm"><i class="fa-regular fa-bell"></i></div>
+                            <div class="admin-mobile-hide flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-lg text-slate-500 shadow-sm"><i class="fa-regular fa-bell"></i></div>
 
-                            <div class="relative" data-profile-dropdown>
-                                <button type="button" class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm" data-profile-trigger>
+                            <div class="relative min-w-0" data-profile-dropdown>
+                                <button type="button" class="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 shadow-sm sm:w-auto" data-profile-trigger>
                                     <div class="admin-profile-avatar flex h-12 w-12 items-center justify-center rounded-2xl text-lg"><i class="fa-solid fa-user-tie"></i></div>
-                                    <div class="text-left text-sm">
+                                    <div class="min-w-0 flex-1 text-left text-sm sm:flex-none">
                                         <div class="font-semibold text-slate-900">{{ auth()->user()->name }}</div>
                                         <div class="text-slate-500">Super Admin</div>
                                     </div>
                                     <span class="ml-2 text-slate-400 transition" data-profile-chevron><i class="fa-solid fa-chevron-down"></i></span>
                                 </button>
 
-                                <div class="absolute right-0 top-[calc(100%+0.75rem)] z-30 hidden w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl" data-profile-menu>
+                                <div class="absolute left-0 right-0 top-[calc(100%+0.75rem)] z-30 hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl sm:left-auto sm:right-0 sm:w-56" data-profile-menu>
                                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900">
                                         <i class="fa-solid fa-house w-4 text-center"></i>
                                         <span>Dashboard</span>

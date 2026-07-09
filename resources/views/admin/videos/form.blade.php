@@ -46,9 +46,9 @@
                 </select>
             </div>
 
-            <div class="flex gap-3">
-                <button type="submit" class="btn-primary">Simpan</button>
-                <a href="{{ route('admin.videos.index') }}" class="btn-secondary">Kembali</a>
+            <div class="flex flex-col gap-3 sm:flex-row">
+                <button type="submit" class="btn-primary w-full sm:w-auto">Simpan</button>
+                <a href="{{ route('admin.videos.index') }}" class="btn-secondary w-full sm:w-auto">Kembali</a>
             </div>
         </form>
     </div>
