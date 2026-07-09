@@ -4,6 +4,10 @@
 
 @push('styles')
     <style>
+        .admin-shell {
+            overflow-x: hidden;
+        }
+
         .admin-sidebar {
             background:
                 radial-gradient(circle at top, rgba(33, 167, 246, 0.24), transparent 32%),
@@ -72,16 +76,42 @@
             #admin-sidebar {
                 position: fixed;
                 inset: 0 auto 0 0;
-                z-index: 50;
+                z-index: 60;
                 display: flex;
-                height: 100vh;
-                border-radius: 0 2rem 2rem 0;
-                transform: translateX(-110%);
-                transition: transform 0.25s ease;
+                flex-direction: column;
+                width: min(88vw, 332px);
+                max-width: 100%;
+                height: 100dvh;
+                padding-top: calc(env(safe-area-inset-top) + 0.65rem);
+                padding-bottom: calc(env(safe-area-inset-bottom) + 0.85rem);
+                border-radius: 0 1.75rem 1.75rem 0;
+                transform: translateX(-105%);
+                visibility: hidden;
+                opacity: 0;
+                pointer-events: none;
+                transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.32s ease, opacity 0.32s ease, box-shadow 0.32s ease;
+                overscroll-behavior: contain;
+                -webkit-overflow-scrolling: touch;
+                box-shadow: 0 0 0 rgba(2, 8, 23, 0);
             }
 
             #admin-sidebar.is-open {
                 transform: translateX(0);
+                visibility: visible;
+                opacity: 1;
+                pointer-events: auto;
+                box-shadow: 0 24px 70px rgba(2, 8, 23, 0.3);
+            }
+
+            #admin-sidebar-backdrop {
+                z-index: 55;
+                opacity: 0;
+                backdrop-filter: blur(4px);
+                transition: opacity 0.28s ease;
+            }
+
+            #admin-sidebar-backdrop:not(.hidden) {
+                opacity: 1;
             }
 
             .admin-mobile-hide {
@@ -138,9 +168,9 @@
             <div id="admin-sidebar-backdrop" class="fixed inset-0 z-40 hidden bg-slate-950/35 backdrop-blur-[2px] lg:hidden"></div>
 
             <aside id="admin-sidebar" class="admin-sidebar hidden h-screen w-[280px] shrink-0 overflow-y-auto border-r border-white/10 text-white shadow-2xl lg:sticky lg:top-0 lg:flex lg:flex-col">
-                <div class="p-7">
+                <div class="p-6 sm:p-7">
                     <div class="flex items-center gap-3" data-admin-brand>
-                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10 p-2 shadow-lg shadow-blue-500/20">
+                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 p-2 shadow-lg shadow-blue-500/20 backdrop-blur-sm">
                             <img src="{{ asset('favicon-96.png') }}" alt="SoluShare" class="h-full w-full object-contain">
                         </div>
                         <div data-admin-brand-copy>
@@ -150,41 +180,41 @@
                     </div>
                 </div>
 
-                <div class="px-7 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-100/45" data-admin-menu-label>Menu Utama</div>
+                <div class="px-6 text-[11px] font-semibold uppercase tracking-[0.28em] text-blue-100/45 sm:px-7" data-admin-menu-label>Menu Utama</div>
 
-                <nav class="mt-5 flex-1 space-y-2 px-4 text-sm">
-                    <a href="{{ route('admin.dashboard') }}" class="admin-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
+                <nav class="mt-5 flex-1 space-y-2 px-3 text-sm sm:px-4">
+                    <a href="{{ route('admin.dashboard') }}" class="admin-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition duration-200 hover:translate-x-0.5" data-admin-nav-link>
                         <i class="fa-solid fa-house w-5 text-center"></i>
                         <span data-admin-nav-text>Dashboard</span>
                     </a>
-                    <a href="{{ route('admin.articles.index') }}" class="admin-nav-link {{ request()->routeIs('admin.articles.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
+                    <a href="{{ route('admin.articles.index') }}" class="admin-nav-link {{ request()->routeIs('admin.articles.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition duration-200 hover:translate-x-0.5" data-admin-nav-link>
                         <i class="fa-regular fa-newspaper w-5 text-center"></i>
                         <span data-admin-nav-text>Articles</span>
                     </a>
-                    <a href="{{ route('admin.videos.index') }}" class="admin-nav-link {{ request()->routeIs('admin.videos.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
+                    <a href="{{ route('admin.videos.index') }}" class="admin-nav-link {{ request()->routeIs('admin.videos.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition duration-200 hover:translate-x-0.5" data-admin-nav-link>
                         <i class="fa-regular fa-circle-play w-5 text-center"></i>
                         <span data-admin-nav-text>Videos</span>
                     </a>
-                    <a href="{{ route('admin.game-card-sets.index') }}" class="admin-nav-link {{ request()->routeIs('admin.game-card-sets.*', 'admin.game-cards.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
+                    <a href="{{ route('admin.game-card-sets.index') }}" class="admin-nav-link {{ request()->routeIs('admin.game-card-sets.*', 'admin.game-cards.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition duration-200 hover:translate-x-0.5" data-admin-nav-link>
                         <i class="fa-regular fa-clone w-5 text-center"></i>
                         <span data-admin-nav-text>Card Sets</span>
                     </a>
-                    <a href="{{ route('admin.room-reports.index') }}" class="admin-nav-link {{ request()->routeIs('admin.room-reports.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
+                    <a href="{{ route('admin.room-reports.index') }}" class="admin-nav-link {{ request()->routeIs('admin.room-reports.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition duration-200 hover:translate-x-0.5" data-admin-nav-link>
                         <i class="fa-regular fa-file-lines w-5 text-center"></i>
                         <span data-admin-nav-text>Laporan</span>
                     </a>
-                    <a href="{{ route('admin.peserta.index') }}" class="admin-nav-link {{ request()->routeIs('admin.peserta.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
+                    <a href="{{ route('admin.peserta.index') }}" class="admin-nav-link {{ request()->routeIs('admin.peserta.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition duration-200 hover:translate-x-0.5" data-admin-nav-link>
                         <i class="fa-solid fa-users w-5 text-center"></i>
                         <span data-admin-nav-text>Peserta</span>
                     </a>
-                    <a href="{{ route('admin.settings.account.edit') }}" class="admin-nav-link {{ request()->routeIs('admin.settings.account.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition" data-admin-nav-link>
+                    <a href="{{ route('admin.settings.account.edit') }}" class="admin-nav-link {{ request()->routeIs('admin.settings.account.*') ? 'active' : '' }} flex items-center gap-3 rounded-2xl px-4 py-3 transition duration-200 hover:translate-x-0.5" data-admin-nav-link>
                         <i class="fa-solid fa-gear w-5 text-center"></i>
                         <span data-admin-nav-text>Pengaturan Akun</span>
                     </a>
                 </nav>
 
-                <div class="mt-auto border-t border-white/10 p-5">
-                    <a href="{{ route('admin.settings.account.edit') }}" class="admin-settings-card block rounded-2xl p-4 transition" data-admin-settings-card>
+                <div class="mt-auto border-t border-white/10 p-4 sm:p-5">
+                    <a href="{{ route('admin.settings.account.edit') }}" class="admin-settings-card block rounded-2xl p-4 transition duration-200 hover:-translate-y-0.5" data-admin-settings-card>
                         <div class="text-sm font-semibold" data-admin-settings-title>Pengaturan Akun</div>
                         <div class="mt-1 text-xs text-blue-100/60" data-admin-settings-copy>Ubah email login dan password admin kapan saja.</div>
                     </a>
@@ -200,8 +230,8 @@
 
                     <div class="mt-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                         <div class="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
-                            <button id="admin-sidebar-toggle" type="button" class="flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-sky-300 hover:text-sky-600">
-                                <i class="fa-solid fa-bars"></i>
+                            <button id="admin-sidebar-toggle" type="button" class="group flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 shadow-[0_10px_30px_rgba(15,23,42,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-600 active:scale-[0.97] active:shadow-[0_6px_18px_rgba(14,116,144,0.16)]">
+                                <i class="fa-solid fa-bars text-lg transition-transform duration-200 group-hover:scale-110"></i>
                             </button>
                             <div class="relative min-w-0 flex-1 xl:w-[360px]">
                                 <input id="admin-search-input" type="text" class="field h-12 pl-11 pr-24" placeholder="Cari sesuatu...">
@@ -277,6 +307,7 @@
             const menu = dropdown.find('[data-profile-menu]');
             const chevron = dropdown.find('[data-profile-chevron]');
             const searchItems = [];
+            let mobileSidebarTimer = null;
 
             function isDesktop() {
                 return window.innerWidth >= 1024;
@@ -287,38 +318,64 @@
             }
 
             function openSidebar() {
+                if (mobileSidebarTimer) {
+                    window.clearTimeout(mobileSidebarTimer);
+                    mobileSidebarTimer = null;
+                }
+
                 sidebar.removeClass('hidden').addClass('is-open');
+                sidebar.css({
+                    visibility: 'visible',
+                    opacity: 1,
+                    pointerEvents: 'auto'
+                });
                 backdrop.removeClass('hidden');
+                backdrop.css('opacity', 1);
                 lockBody(true);
             }
 
             function closeSidebar() {
+                if (mobileSidebarTimer) {
+                    window.clearTimeout(mobileSidebarTimer);
+                    mobileSidebarTimer = null;
+                }
+
                 if (isDesktop()) {
-                    backdrop.addClass('hidden');
+                    sidebar.removeClass('is-open');
+                    backdrop.addClass('hidden').css('opacity', 0);
                     lockBody(false);
                     return;
                 }
 
                 sidebar.removeClass('is-open');
-                backdrop.addClass('hidden');
+                sidebar.css({
+                    visibility: 'hidden',
+                    opacity: 0,
+                    pointerEvents: 'none'
+                });
+                backdrop.removeClass('hidden').css('opacity', 0);
                 lockBody(false);
-
-                window.setTimeout(function() {
-                    if (!isDesktop()) {
-                        sidebar.addClass('hidden');
-                    }
-                }, 250);
             }
 
             function syncSidebarState() {
                 if (isDesktop()) {
                     sidebar.removeClass('hidden is-open');
-                    backdrop.addClass('hidden');
+                    sidebar.css({
+                        visibility: 'visible',
+                        opacity: 1,
+                        pointerEvents: 'auto'
+                    });
+                    backdrop.addClass('hidden').css('opacity', 0);
                     lockBody(false);
                 } else {
                     shell.removeClass('is-collapsed');
                     sidebar.addClass('hidden').removeClass('is-open');
-                    backdrop.addClass('hidden');
+                    sidebar.css({
+                        visibility: 'hidden',
+                        opacity: 0,
+                        pointerEvents: 'none'
+                    });
+                    backdrop.addClass('hidden').css('opacity', 0);
                     lockBody(false);
                 }
             }
@@ -469,6 +526,12 @@
             });
 
             backdrop.on('click', closeSidebar);
+
+            sidebar.on('click', '[data-admin-nav-link]', function() {
+                if (!isDesktop()) {
+                    closeSidebar();
+                }
+            });
 
             $(window).on('resize', syncSidebarState);
 
