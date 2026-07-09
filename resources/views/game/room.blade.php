@@ -641,6 +641,8 @@
                                             Kartu {{ $room->current_card_order }} sedang aktif.
                                         @elseif ($room->status === 'finished')
                                             Sesi sudah diakhiri. Room tetap bisa dibuka untuk melihat kartu terakhir dan riwayat chat.
+                                        @elseif ($room->status === 'playing')
+                                            Menunggu {{ $room->nextTurnParticipant?->public_name ?? 'peserta' }} membuka kartu pertama.
                                         @else
                                             Menunggu host memulai permainan.
                                         @endif
@@ -648,7 +650,7 @@
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <span id="target-badge" class="{{ $room->currentTargetParticipant ? '' : 'hidden ' }}rounded-full bg-emerald-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-                                        Untuk {{ $room->currentTargetParticipant?->public_name }}
+                                        Dibuka oleh {{ $room->currentTargetParticipant?->public_name }}
                                     </span>
                                     <span class="rounded-full bg-slate-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-600">{{ $participant->public_name }}</span>
                                 </div>
@@ -687,14 +689,17 @@
 
                                 @php
                                     $isPlaying = $room->status === 'playing' && $room->currentCard;
+                                    $isAwaitingClaim = $room->status === 'playing' && ! $room->currentCard;
                                     $cardState = $isPlaying ? 'state-playing' : ($room->status === 'finished' ? 'state-finished' : 'state-waiting');
-                                    $cardIcon = $isPlaying ? 'fa-regular fa-heart' : ($room->status === 'finished' ? 'fa-solid fa-circle-check' : 'fa-regular fa-hourglass-half');
-                                    $cardTitle = $isPlaying ? $room->currentCard->title : ($room->status === 'finished' ? 'Sesi telah selesai' : 'Ruang tunggu aktif');
+                                    $cardIcon = $isPlaying ? 'fa-regular fa-heart' : ($room->status === 'finished' ? 'fa-solid fa-circle-check' : ($isAwaitingClaim ? 'fa-solid fa-hand-pointer' : 'fa-regular fa-hourglass-half'));
+                                    $cardTitle = $isPlaying ? $room->currentCard->title : ($room->status === 'finished' ? 'Sesi telah selesai' : ($isAwaitingClaim ? 'Menunggu kartu dibuka' : 'Ruang tunggu aktif'));
                                     $cardQuestion = $isPlaying
                                         ? $room->currentCard->question
                                         : ($room->status === 'finished'
                                             ? 'Room ini sudah diakhiri, tetapi kamu masih bisa membuka kembali halaman ini untuk melihat kartu terakhir, peserta, dan riwayat percakapan.'
-                                            : 'Peserta bisa bergabung menggunakan kode room ini. Host dapat menyalakan mode anonymous dan mulai game saat semua siap.');
+                                            : ($isAwaitingClaim
+                                                ? 'Menunggu '.($room->nextTurnParticipant?->public_name ?? 'peserta').' membuka kartu berikutnya.'
+                                                : 'Peserta bisa bergabung menggunakan kode room ini. Host dapat menyalakan mode anonymous dan mulai game saat semua siap.'));
                                 @endphp
 
                                 <div id="active-card-panel" class="{{ $cardState }} p-6 text-slate-900 sm:p-8 lg:p-10 xl:p-12">
@@ -743,17 +748,29 @@
                                 </div>
                             </div>
 
+                            @php
+                                $cardsRemainingNow = max($room->cardSet->cards->where('status', 'active')->count() - count($room->opened_card_ids ?? []), 0);
+                                $isMyTurn = $room->nextTurnParticipant && $participant->id === $room->nextTurnParticipant->id;
+                            @endphp
+
+                            <div id="turn-action-container" class="mt-8 text-center">
+                                @if ($room->status === 'playing' && $room->nextTurnParticipant && $cardsRemainingNow > 0)
+                                    @if ($isMyTurn)
+                                        <button type="button" id="open-next-card-button" class="btn-primary js-room-action" data-url="{{ route('game.rooms.shuffle', $room->code) }}">
+                                            <i class="fa-solid fa-hand-pointer mr-2"></i>Giliranmu! Buka Kartu Berikutnya
+                                        </button>
+                                    @else
+                                        <p class="text-sm text-slate-500">Menunggu <span class="font-semibold text-slate-700">{{ $room->nextTurnParticipant->public_name }}</span> membuka kartu berikutnya...</p>
+                                    @endif
+                                @endif
+                            </div>
+
                             @if ($participant->is_host)
-                                <div class="mt-8 grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
+                                <div id="host-action-bar" class="mt-4 grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-center">
                                     @if ($room->status === 'waiting')
                                         <button type="button" class="btn-primary js-room-action js-start-session-button" data-url="{{ route('game.rooms.start', $room->code) }}">Mulai Sesi</button>
                                     @endif
-                                    @if ($room->status === 'playing' && max($room->cardSet->cards->where('status', 'active')->count() - count($room->opened_card_ids ?? []), 0) > 0)
-                                        <button type="button" id="shuffle-card-button" class="btn-primary js-room-action" data-url="{{ route('game.rooms.shuffle', $room->code) }}">
-                                            <i class="fa-solid fa-shuffle mr-2"></i>Acak Kartu
-                                        </button>
-                                    @endif
-                                    @if ($room->status === 'playing' && max($room->cardSet->cards->where('status', 'active')->count() - count($room->opened_card_ids ?? []), 0) === 0)
+                                    @if ($room->status === 'playing' && $cardsRemainingNow === 0)
                                         <button type="button" id="reset-deck-button" class="btn-secondary js-room-action" data-url="{{ route('game.rooms.reset-deck', $room->code) }}">
                                             <i class="fa-solid fa-rotate-left mr-2"></i>Reset Kartu
                                         </button>
@@ -810,6 +827,7 @@
         const messagesUrl = @json(route('game.rooms.messages', $room->code));
         const sendMessageUrl = @json(route('game.rooms.messages.store', $room->code));
         const resetDeckUrl = @json(route('game.rooms.reset-deck', $room->code));
+        const openNextCardUrl = @json(route('game.rooms.shuffle', $room->code));
         const feedbackUrl = @json(route('game.rooms.feedback', $room->code));
         const homeUrl = @json(route('home'));
         let isAnimatingShuffle = false;
@@ -825,18 +843,23 @@
         function renderStatus(data) {
             const playing = data.status === 'playing' && data.current_card;
             const finished = data.status === 'finished';
+            const awaitingClaim = data.status === 'playing' && !data.current_card;
 
             if (data.status !== 'waiting') {
                 $('.js-start-session-button').remove();
             }
 
-            $('#room-status-title').text(playing ? 'Kartu Aktif' : (finished ? 'Sesi Selesai' : 'Waiting Room'));
+            const nextTurn = data.next_turn_participant || null;
+
+            $('#room-status-title').text(playing ? 'Kartu Aktif' : (finished ? 'Sesi Selesai' : (awaitingClaim ? 'Menunggu Kartu' : 'Waiting Room')));
             $('#room-status-text').text(
                 playing
                     ? `Kartu ${data.current_card_order} sedang aktif.`
                     : (finished
                         ? 'Sesi sudah diakhiri. Room tetap bisa dibuka untuk melihat kartu terakhir dan riwayat chat.'
-                        : 'Menunggu host memulai permainan.')
+                        : (awaitingClaim
+                            ? `Menunggu ${nextTurn ? nextTurn.name : 'peserta'} membuka kartu pertama.`
+                            : 'Menunggu host memulai permainan.'))
             );
 
             const panel = $('#active-card-panel');
@@ -859,6 +882,11 @@
                 iconEl.attr('class', 'fa-solid fa-circle-check');
                 titleEl.text('Sesi telah selesai');
                 questionEl.text('Room ini sudah diakhiri, tetapi kamu masih bisa membuka kembali halaman ini untuk melihat kartu terakhir, peserta, dan riwayat percakapan.');
+            } else if (awaitingClaim) {
+                panel.addClass('state-waiting');
+                iconEl.attr('class', 'fa-solid fa-hand-pointer');
+                titleEl.text('Menunggu kartu dibuka');
+                questionEl.text(`Menunggu ${nextTurn ? nextTurn.name : 'peserta'} membuka kartu berikutnya.`);
             } else {
                 panel.addClass('state-waiting');
                 iconEl.attr('class', 'fa-regular fa-hourglass-half');
@@ -867,29 +895,36 @@
             }
 
             if (target) {
-                targetBadge.removeClass('hidden').text(`Untuk ${target.name}`);
+                targetBadge.removeClass('hidden').text(`Dibuka oleh ${target.name}`);
             } else {
                 targetBadge.addClass('hidden').text('');
             }
 
             cardsRemainingBadge.text(`Sisa ${data.cards_remaining} kartu`);
 
-            const actionBar = $('.js-room-action').parent();
-            const shuffleButton = $('#shuffle-card-button');
-            const resetDeckButton = $('#reset-deck-button');
+            const turnActionContainer = $('#turn-action-container');
 
-            if (actionBar.length) {
-                if (data.status === 'playing' && !data.cards_exhausted) {
-                    if (!shuffleButton.length) {
-                        actionBar.prepend(`
-                            <button type="button" id="shuffle-card-button" class="btn-primary js-room-action" data-url="${@json(route('game.rooms.shuffle', $room->code))}">
-                                <i class="fa-solid fa-shuffle mr-2"></i>Acak Kartu
+            if (data.status === 'playing' && !data.cards_exhausted && nextTurn) {
+                if (nextTurn.is_me) {
+                    if (!$('#open-next-card-button').length) {
+                        turnActionContainer.html(`
+                            <button type="button" id="open-next-card-button" class="btn-primary js-room-action" data-url="${openNextCardUrl}">
+                                <i class="fa-solid fa-hand-pointer mr-2"></i>Giliranmu! Buka Kartu Berikutnya
                             </button>
                         `);
                     }
-                    resetDeckButton.remove();
-                } else if (data.status === 'playing' && data.cards_exhausted) {
-                    shuffleButton.remove();
+                } else {
+                    turnActionContainer.html(`<p class="text-sm text-slate-500">Menunggu <span class="font-semibold text-slate-700">${escapeHtml(nextTurn.name)}</span> membuka kartu berikutnya...</p>`);
+                }
+            } else {
+                turnActionContainer.empty();
+            }
+
+            const actionBar = $('#host-action-bar');
+            const resetDeckButton = $('#reset-deck-button');
+
+            if (actionBar.length) {
+                if (data.status === 'playing' && data.cards_exhausted) {
                     if (!resetDeckButton.length) {
                         actionBar.prepend(`
                             <button type="button" id="reset-deck-button" class="btn-secondary js-room-action" data-url="${resetDeckUrl}">
@@ -902,7 +937,6 @@
                     titleEl.text('Semua kartu sudah terbuka');
                     questionEl.text('Semua kartu pada deck ini sudah dibuka. Kamu bisa reset kartu untuk memulai putaran baru, atau akhiri sesi jika diskusi sudah selesai.');
                 } else {
-                    shuffleButton.remove();
                     resetDeckButton.remove();
                 }
             }
@@ -912,18 +946,11 @@
             if (target && target.id !== latestTargetParticipantId) {
                 latestTargetParticipantId = target.id;
 
-                if (target.is_me) {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Giliran Kamu Menjawab',
-                        text: `Kartu ini ditujukan untuk ${target.name}. Silakan jawab kartunya sekarang.`,
-                        confirmButtonColor: '#2563eb'
-                    });
-                } else {
+                if (!target.is_me) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Kartu Baru Dibuka',
-                        text: `Kartu ini ditujukan untuk ${target.name}.`,
+                        text: `Kartu ini dibuka oleh ${target.name}.`,
                         timer: 2200,
                         showConfirmButton: false
                     });
@@ -1151,7 +1178,7 @@
 
             const button = $(this);
             const url = button.data('url');
-            const isShuffle = button.attr('id') === 'shuffle-card-button';
+            const isShuffle = button.attr('id') === 'open-next-card-button';
             const originalHtml = button.html();
 
             if (!url || button.prop('disabled')) {
@@ -1166,7 +1193,7 @@
                 triggerShuffleAnimation();
             }
 
-            button.prop('disabled', true).addClass('opacity-70').html(isShuffle ? '<i class="fa-solid fa-shuffle mr-2"></i>Mengacak...' : 'Memproses...');
+            button.prop('disabled', true).addClass('opacity-70').html(isShuffle ? '<i class="fa-solid fa-hand-pointer mr-2"></i>Membuka...' : 'Memproses...');
 
             $.ajax({
                 url: url,

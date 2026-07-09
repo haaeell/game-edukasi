@@ -83,7 +83,7 @@ Route::post('/game/room/{code}/start', [RoomAccessController::class, 'start'])->
 Route::post('/game/room/{code}/anonymous-toggle', [RoomAccessController::class, 'toggleAnonymous'])->name('game.rooms.toggle-anonymous');
 Route::post('/game/room/{code}/invite', [RoomInteractionController::class, 'invite'])->middleware('auth')->name('game.rooms.invite');
 Route::post('/game/room/{code}/next-card', [RoomInteractionController::class, 'nextCard'])->middleware('auth')->name('game.rooms.next');
-Route::post('/game/room/{code}/shuffle-card', [RoomInteractionController::class, 'shuffleCard'])->middleware('auth')->name('game.rooms.shuffle');
+Route::post('/game/room/{code}/shuffle-card', [RoomInteractionController::class, 'shuffleCard'])->name('game.rooms.shuffle');
 Route::post('/game/room/{code}/reset-deck', [RoomInteractionController::class, 'resetDeck'])->middleware('auth')->name('game.rooms.reset-deck');
 Route::post('/game/room/{code}/previous-card', [RoomInteractionController::class, 'previousCard'])->middleware('auth')->name('game.rooms.previous');
 Route::post('/game/room/{code}/end', [RoomInteractionController::class, 'end'])->middleware('auth')->name('game.rooms.end');

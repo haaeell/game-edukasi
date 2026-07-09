@@ -132,28 +132,25 @@ class GameRoomService
 
     public function startRoom(GameRoom $room): GameRoom
     {
-        $firstCard = $room->cardSet->cards()
-            ->where('status', 'active')
-            ->orderBy('order_number')
-            ->first();
-        $targetParticipant = $firstCard ? $this->pickRandomTargetParticipant($room) : null;
+        $nextTurnParticipant = $this->pickRandomTargetParticipant($room);
 
         $room->update([
             'status' => 'playing',
-            'current_game_card_id' => $firstCard?->id,
-            'current_target_participant_id' => $targetParticipant?->id,
-            'current_card_order' => $firstCard?->order_number,
-            'opened_card_ids' => $firstCard ? [$firstCard->id] : [],
-            'current_card_started_at' => $firstCard ? Carbon::now() : null,
+            'current_game_card_id' => null,
+            'current_target_participant_id' => null,
+            'next_turn_participant_id' => $nextTurnParticipant?->id,
+            'current_card_order' => null,
+            'opened_card_ids' => [],
+            'current_card_started_at' => null,
             'started_at' => $room->started_at ?? Carbon::now(),
             'ended_at' => null,
         ]);
 
-        if ($firstCard) {
-            $this->createSystemMessage($room, 'Game dimulai. Kartu pertama telah dibuka.');
+        if ($nextTurnParticipant) {
+            $this->createSystemMessage($room, 'Game dimulai. Giliran '.$nextTurnParticipant->public_name.' membuka kartu pertama.');
         }
 
-        return $room->fresh(['currentCard', 'cardSet', 'currentTargetParticipant']);
+        return $room->fresh(['currentCard', 'cardSet', 'currentTargetParticipant', 'nextTurnParticipant']);
     }
 
     public function moveToNextCard(GameRoom $room): GameRoom
@@ -183,7 +180,7 @@ class GameRoomService
         return $room->fresh(['currentCard', 'cardSet.cards']);
     }
 
-    public function shuffleToRandomCard(GameRoom $room): GameRoom
+    public function openCardForParticipant(GameRoom $room, GameRoomParticipant $claimant): GameRoom
     {
         if ($room->status !== 'playing') {
             return $room;
@@ -202,41 +199,50 @@ class GameRoomService
         $pool = $cards->reject(fn ($card) => $openedCardIds->contains((int) $card->id))->values();
 
         if ($pool->isEmpty()) {
-            return $room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant']);
+            return $room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant', 'nextTurnParticipant']);
         }
 
         $nextCard = $pool->random();
-
-        $targetParticipant = $this->pickRandomTargetParticipant($room, $room->current_target_participant_id);
         $openedCardIds = $openedCardIds->push((int) $nextCard->id)->unique()->values();
+
+        $remainingAfterThisCard = $pool->count() - 1;
+        $nextTurnParticipant = $remainingAfterThisCard > 0
+            ? $this->pickRandomTargetParticipant($room, $claimant->id)
+            : null;
 
         $room->update([
             'current_game_card_id' => $nextCard->id,
-            'current_target_participant_id' => $targetParticipant?->id,
+            'current_target_participant_id' => $claimant->id,
+            'next_turn_participant_id' => $nextTurnParticipant?->id,
             'current_card_order' => $nextCard->order_number,
             'opened_card_ids' => $openedCardIds->all(),
             'current_card_started_at' => now(),
         ]);
 
-        $targetName = $targetParticipant?->public_name ?: 'peserta terpilih';
-        $this->createSystemMessage($room, 'Kartu diacak. Kartu '.$nextCard->order_number.' telah dibuka untuk '.$targetName.'.');
+        $this->createSystemMessage($room, $claimant->public_name.' membuka kartu '.$nextCard->order_number.'.');
 
-        return $room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant']);
+        return $room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant', 'nextTurnParticipant']);
     }
 
     public function resetRoomDeck(GameRoom $room): GameRoom
     {
+        $nextTurnParticipant = $this->pickRandomTargetParticipant($room);
+
         $room->update([
             'current_game_card_id' => null,
             'current_target_participant_id' => null,
+            'next_turn_participant_id' => $nextTurnParticipant?->id,
             'current_card_order' => null,
             'opened_card_ids' => [],
             'current_card_started_at' => null,
         ]);
 
-        $this->createSystemMessage($room, 'Deck kartu direset. Host dapat mengacak kartu lagi dari awal.');
+        $message = $nextTurnParticipant
+            ? 'Deck kartu direset. Giliran '.$nextTurnParticipant->public_name.' membuka kartu berikutnya.'
+            : 'Deck kartu direset.';
+        $this->createSystemMessage($room, $message);
 
-        return $room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant']);
+        return $room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant', 'nextTurnParticipant']);
     }
 
     public function moveToPreviousCard(GameRoom $room): GameRoom
@@ -271,6 +277,7 @@ class GameRoomService
         $room->update([
             'status' => 'finished',
             'current_target_participant_id' => null,
+            'next_turn_participant_id' => null,
             'ended_at' => now(),
         ]);
 
@@ -310,6 +317,11 @@ class GameRoomService
                 'id' => $room->currentTargetParticipant->id,
                 'name' => $room->currentTargetParticipant->public_name,
                 'is_me' => $viewer ? $room->currentTargetParticipant->id === $viewer->id : false,
+            ] : null,
+            'next_turn_participant' => $room->nextTurnParticipant ? [
+                'id' => $room->nextTurnParticipant->id,
+                'name' => $room->nextTurnParticipant->public_name,
+                'is_me' => $viewer ? $room->nextTurnParticipant->id === $viewer->id : false,
             ] : null,
         ];
     }

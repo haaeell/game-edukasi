@@ -125,6 +125,7 @@ class RoomAccessController extends Controller
             'cardSet.cards',
             'currentCard',
             'currentTargetParticipant',
+            'nextTurnParticipant',
             'participants' => fn ($query) => $query->orderByDesc('is_host')->orderBy('display_name'),
             'participants.user',
         ])->where('code', strtoupper($code))->firstOrFail();

@@ -23,6 +23,7 @@ class GameRoom extends Model
         'status',
         'current_game_card_id',
         'current_target_participant_id',
+        'next_turn_participant_id',
         'current_card_order',
         'opened_card_ids',
         'current_card_started_at',
@@ -62,6 +63,11 @@ class GameRoom extends Model
     public function currentTargetParticipant(): BelongsTo
     {
         return $this->belongsTo(GameRoomParticipant::class, 'current_target_participant_id');
+    }
+
+    public function nextTurnParticipant(): BelongsTo
+    {
+        return $this->belongsTo(GameRoomParticipant::class, 'next_turn_participant_id');
     }
 
     public function participants(): HasMany

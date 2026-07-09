@@ -54,12 +54,17 @@ class RoomInteractionController extends Controller
 
     public function shuffleCard(Request $request, string $code): JsonResponse
     {
-        $room = $this->loadRoomForControl($code, $request);
-        $room = $this->gameRoomService->shuffleToRandomCard($room);
+        $room = GameRoom::with(['cardSet.cards', 'participants', 'currentCard', 'currentTargetParticipant', 'nextTurnParticipant'])->where('code', strtoupper($code))->firstOrFail();
+        $participant = $this->gameRoomService->resolveParticipant($room, $request);
+
+        abort_unless($participant, 403);
+        abort_unless($room->next_turn_participant_id === $participant->id, 403);
+
+        $room = $this->gameRoomService->openCardForParticipant($room, $participant);
         $participant = $this->gameRoomService->resolveParticipant($room, $request);
 
         return response()->json([
-            'message' => 'Kartu berhasil diacak.',
+            'message' => 'Kartu berhasil dibuka.',
             'status' => $this->gameRoomService->buildStatusPayload($room, $participant),
         ]);
     }
@@ -103,7 +108,7 @@ class RoomInteractionController extends Controller
 
     public function status(Request $request, string $code): JsonResponse
     {
-        $room = GameRoom::with(['currentCard', 'cardSet.cards', 'currentTargetParticipant'])->where('code', strtoupper($code))->firstOrFail();
+        $room = GameRoom::with(['currentCard', 'cardSet.cards', 'currentTargetParticipant', 'nextTurnParticipant'])->where('code', strtoupper($code))->firstOrFail();
         $participant = $this->gameRoomService->resolveParticipant($room, $request);
 
         if (! $participant) {
@@ -114,7 +119,7 @@ class RoomInteractionController extends Controller
             abort(403);
         }
 
-        return response()->json($this->gameRoomService->buildStatusPayload($room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant']), $participant));
+        return response()->json($this->gameRoomService->buildStatusPayload($room->fresh(['currentCard', 'cardSet.cards', 'currentTargetParticipant', 'nextTurnParticipant']), $participant));
     }
 
     public function submitFeedback(SubmitFeedbackRequest $request, string $code): JsonResponse
@@ -219,7 +224,7 @@ class RoomInteractionController extends Controller
 
     private function loadRoomForControl(string $code, Request $request): GameRoom
     {
-        $room = GameRoom::with(['cardSet.cards', 'participants', 'currentCard', 'currentTargetParticipant'])->where('code', strtoupper($code))->firstOrFail();
+        $room = GameRoom::with(['cardSet.cards', 'participants', 'currentCard', 'currentTargetParticipant', 'nextTurnParticipant'])->where('code', strtoupper($code))->firstOrFail();
         $participant = $this->gameRoomService->resolveParticipant($room, $request);
 
         abort_unless($participant?->is_host, 403);
