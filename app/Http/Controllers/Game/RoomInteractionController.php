@@ -57,6 +57,19 @@ class RoomInteractionController extends Controller
         $room = GameRoom::with(['cardSet.cards', 'participants', 'currentCard', 'currentTargetParticipant', 'nextTurnParticipant'])->where('code', strtoupper($code))->firstOrFail();
         $participant = $this->gameRoomService->resolveParticipant($room, $request);
 
+        if (! $participant || $room->next_turn_participant_id !== $participant->id) {
+            \Illuminate\Support\Facades\Log::warning('shuffleCard denied', [
+                'room_code' => $room->code,
+                'session_id' => $request->session()->getId(),
+                'guest_key' => $this->gameRoomService->getGuestSessionKey($room),
+                'session_participant_id' => $request->session()->get($this->gameRoomService->getGuestSessionKey($room)),
+                'resolved_participant_id' => $participant?->id,
+                'next_turn_participant_id' => $room->next_turn_participant_id,
+                'user_id' => $request->user()?->id,
+                'cookie_present' => $request->hasCookie(config('session.cookie')),
+            ]);
+        }
+
         abort_unless($participant, 403);
         abort_unless($room->next_turn_participant_id === $participant->id, 403);
 
