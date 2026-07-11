@@ -55,6 +55,8 @@ Route::prefix('admin')
         Route::post('game-card-sets/{gameCardSet}/cards/{card}/move-up', [AdminGameCardController::class, 'moveUp'])->name('game-cards.move-up');
         Route::post('game-card-sets/{gameCardSet}/cards/{card}/move-down', [AdminGameCardController::class, 'moveDown'])->name('game-cards.move-down');
         Route::get('room-reports', [AdminRoomReportController::class, 'index'])->name('room-reports.index');
+        Route::post('room-reports/{gameRoom}/end', [AdminRoomReportController::class, 'end'])->name('room-reports.end');
+        Route::delete('room-reports/{gameRoom}', [AdminRoomReportController::class, 'destroy'])->name('room-reports.destroy');
         Route::get('room-reports/{gameRoom}', [AdminRoomReportController::class, 'show'])->name('room-reports.show');
         Route::get('room-reports/{gameRoom}/pdf', [AdminRoomReportController::class, 'pdf'])->name('room-reports.pdf');
         Route::get('peserta', [AdminPesertaController::class, 'index'])->name('peserta.index');

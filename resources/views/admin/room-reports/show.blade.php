@@ -36,6 +36,37 @@
                 </div>
 
                 <div class="flex flex-wrap gap-3">
+                    @if ($room->status !== 'finished')
+                        <form
+                            action="{{ route('admin.room-reports.end', $room) }}"
+                            method="POST"
+                            class="js-room-action-form"
+                            data-swal-title="Hentikan permainan?"
+                            data-swal-text="Permainan pada room ini akan langsung diakhiri."
+                            data-swal-confirm="Ya, hentikan"
+                            data-swal-confirm-color="#0c74cf"
+                        >
+                            @csrf
+                            <button type="submit" class="btn-secondary">
+                                <i class="fa-solid fa-stop mr-2"></i>Hentikan Permainan
+                            </button>
+                        </form>
+                    @endif
+                    <form
+                        action="{{ route('admin.room-reports.destroy', $room) }}"
+                        method="POST"
+                        class="js-room-action-form"
+                        data-swal-title="Hapus room ini?"
+                        data-swal-text="Semua data room dan laporan yang terkait akan ikut terhapus."
+                        data-swal-confirm="Ya, hapus"
+                        data-swal-confirm-color="#dc2626"
+                    >
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100">
+                            <i class="fa-regular fa-trash-can mr-2"></i>Hapus Room
+                        </button>
+                    </form>
                     <a href="{{ route('admin.room-reports.pdf', $room) }}" class="btn-primary">
                         <i class="fa-solid fa-file-pdf mr-2"></i>Unduh PDF
                     </a>

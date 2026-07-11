@@ -5,13 +5,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GameCard;
 use App\Models\GameRoom;
+use App\Services\GameRoomService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoomReportController extends Controller
 {
+    public function __construct(private readonly GameRoomService $gameRoomService)
+    {
+    }
+
     public function index(Request $request): View
     {
         $status = $request->query('status');
@@ -58,6 +64,27 @@ class RoomReportController extends Controller
         $fileName = 'laporan-room-'.$gameRoom->code.'.pdf';
 
         return $pdf->download($fileName);
+    }
+
+    public function end(GameRoom $gameRoom): RedirectResponse
+    {
+        if ($gameRoom->status === 'finished') {
+            return back()->with('success', 'Permainan pada room ini sudah selesai.');
+        }
+
+        $this->gameRoomService->endRoom($gameRoom->load(['cardSet.cards', 'participants']));
+
+        return back()->with('success', 'Permainan berhasil dihentikan.');
+    }
+
+    public function destroy(GameRoom $gameRoom): RedirectResponse
+    {
+        $roomTitle = $gameRoom->title;
+        $gameRoom->delete();
+
+        return redirect()
+            ->route('admin.room-reports.index')
+            ->with('success', 'Room "'.$roomTitle.'" berhasil dihapus.');
     }
 
     private function buildReportData(GameRoom $gameRoom): array

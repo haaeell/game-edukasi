@@ -131,8 +131,30 @@
         }
 
         @media (min-width: 1024px) {
+            .admin-shell {
+                position: relative;
+            }
+
+            .admin-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 30;
+                display: flex !important;
+                width: 280px;
+                height: 100vh;
+            }
+
+            .admin-main {
+                margin-left: 280px;
+            }
+
             .admin-shell.is-collapsed #admin-sidebar {
                 width: 104px;
+            }
+
+            .admin-shell.is-collapsed .admin-main {
+                margin-left: 104px;
             }
 
             .admin-shell.is-collapsed [data-admin-brand] {
@@ -167,7 +189,7 @@
         <div class="admin-shell flex min-h-screen">
             <div id="admin-sidebar-backdrop" class="fixed inset-0 z-40 hidden bg-slate-950/35 backdrop-blur-[2px] lg:hidden"></div>
 
-            <aside id="admin-sidebar" class="admin-sidebar hidden h-screen w-[280px] shrink-0 overflow-y-auto border-r border-white/10 text-white shadow-2xl lg:sticky lg:top-0 lg:flex lg:flex-col">
+            <aside id="admin-sidebar" class="admin-sidebar hidden h-screen w-[280px] shrink-0 overflow-y-auto border-r border-white/10 text-white shadow-2xl lg:flex lg:flex-col">
                 <div class="p-6 sm:p-7">
                     <div class="flex items-center gap-3" data-admin-brand>
                         <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/10 p-2 shadow-lg shadow-blue-500/20 backdrop-blur-sm">
@@ -221,7 +243,7 @@
                 </div>
             </aside>
 
-            <main class="glass-panel min-w-0 flex-1 rounded-none border-0 px-4 py-5 sm:px-6 lg:px-8">
+            <main class="admin-main glass-panel min-w-0 flex-1 rounded-none border-0 px-4 py-5 sm:px-6 lg:px-8">
                 <div class="mb-6 border-b border-slate-200/80 pb-5">
                     <div class="text-center">
                         <h1 class="text-3xl font-bold tracking-tight text-slate-900">@yield('page-title')</h1>
@@ -602,6 +624,28 @@
 
             collectSearchItems();
             syncSidebarState();
+
+            $(document).on('submit', '.js-room-action-form', function(event) {
+                event.preventDefault();
+
+                const form = this;
+                const config = $(form).data();
+
+                Swal.fire({
+                    title: config.swalTitle || 'Yakin melanjutkan aksi ini?',
+                    text: config.swalText || 'Perubahan ini akan langsung diproses.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: config.swalConfirm || 'Ya, lanjutkan',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: config.swalConfirmColor || '#2563eb',
+                    cancelButtonColor: '#94a3b8'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
         });
     </script>
 @endpush
