@@ -12,96 +12,108 @@ use Illuminate\View\View;
 
 class GameCardController extends Controller
 {
-    public function create(GameCardSet $gameCardSet): View
+    public function create(int $gameCardSet): View
     {
+        $set = GameCardSet::findOrFail($gameCardSet);
+
         return view('admin.game-cards.create', [
-            'set' => $gameCardSet,
+            'set' => $set,
         ]);
     }
 
-    public function store(StoreGameCardRequest $request, GameCardSet $gameCardSet): RedirectResponse
+    public function store(StoreGameCardRequest $request, int $gameCardSet): RedirectResponse
     {
-        $nextOrder = ((int) $gameCardSet->cards()->max('order_number')) + 1;
+        $set = GameCardSet::findOrFail($gameCardSet);
 
-        $gameCardSet->cards()->create([
+        $nextOrder = ((int) $set->cards()->max('order_number')) + 1;
+
+        $set->cards()->create([
             ...$request->validated(),
             'order_number' => $nextOrder,
         ]);
 
-        return redirect()->route('admin.game-card-sets.show', $gameCardSet)->with('success', 'Kartu berhasil ditambahkan.');
+        return redirect()->route('admin.game-card-sets.show', $set)->with('success', 'Kartu berhasil ditambahkan.');
     }
 
-    public function edit(GameCardSet $gameCardSet, GameCard $card): View
+    public function edit(int $gameCardSet, int $card): View
     {
-        $this->guardSetCardRelation($gameCardSet, $card);
+        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
 
         return view('admin.game-cards.edit', [
-            'set' => $gameCardSet,
-            'card' => $card,
+            'set' => $set,
+            'card' => $gameCard,
         ]);
     }
 
-    public function update(UpdateGameCardRequest $request, GameCardSet $gameCardSet, GameCard $card): RedirectResponse
+    public function update(UpdateGameCardRequest $request, int $gameCardSet, int $card): RedirectResponse
     {
-        $this->guardSetCardRelation($gameCardSet, $card);
+        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
 
-        $card->update($request->validated());
+        $gameCard->update($request->validated());
 
-        return redirect()->route('admin.game-card-sets.show', $gameCardSet)->with('success', 'Kartu berhasil diperbarui.');
+        return redirect()->route('admin.game-card-sets.show', $set)->with('success', 'Kartu berhasil diperbarui.');
     }
 
-    public function destroy(GameCardSet $gameCardSet, GameCard $card): RedirectResponse
+    public function destroy(int $gameCardSet, int $card): RedirectResponse
     {
-        $this->guardSetCardRelation($gameCardSet, $card);
+        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
 
-        $deletedOrder = $card->order_number;
-        $card->delete();
+        $deletedOrder = $gameCard->order_number;
+        $gameCard->delete();
 
-        $gameCardSet->cards()
+        $set->cards()
             ->where('order_number', '>', $deletedOrder)
             ->decrement('order_number');
 
-        return redirect()->route('admin.game-card-sets.show', $gameCardSet)->with('success', 'Kartu berhasil dihapus.');
+        return redirect()->route('admin.game-card-sets.show', $set)->with('success', 'Kartu berhasil dihapus.');
     }
 
-    public function moveUp(GameCardSet $gameCardSet, GameCard $card): RedirectResponse
+    public function moveUp(int $gameCardSet, int $card): RedirectResponse
     {
-        $this->guardSetCardRelation($gameCardSet, $card);
+        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
 
-        $previous = $gameCardSet->cards()
-            ->where('order_number', '<', $card->order_number)
+        $previous = $set->cards()
+            ->where('order_number', '<', $gameCard->order_number)
             ->orderByDesc('order_number')
             ->first();
 
         if ($previous) {
             $previousOrder = $previous->order_number;
-            $previous->update(['order_number' => $card->order_number]);
-            $card->update(['order_number' => $previousOrder]);
+            $previous->update(['order_number' => $gameCard->order_number]);
+            $gameCard->update(['order_number' => $previousOrder]);
         }
 
         return back()->with('success', 'Urutan kartu diperbarui.');
     }
 
-    public function moveDown(GameCardSet $gameCardSet, GameCard $card): RedirectResponse
+    public function moveDown(int $gameCardSet, int $card): RedirectResponse
     {
-        $this->guardSetCardRelation($gameCardSet, $card);
+        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
 
-        $next = $gameCardSet->cards()
-            ->where('order_number', '>', $card->order_number)
+        $next = $set->cards()
+            ->where('order_number', '>', $gameCard->order_number)
             ->orderBy('order_number')
             ->first();
 
         if ($next) {
             $nextOrder = $next->order_number;
-            $next->update(['order_number' => $card->order_number]);
-            $card->update(['order_number' => $nextOrder]);
+            $next->update(['order_number' => $gameCard->order_number]);
+            $gameCard->update(['order_number' => $nextOrder]);
         }
 
         return back()->with('success', 'Urutan kartu diperbarui.');
     }
 
-    private function guardSetCardRelation(GameCardSet $gameCardSet, GameCard $card): void
+    /**
+     * @return array{0: GameCardSet, 1: GameCard}
+     */
+    private function findSetAndCard(int $gameCardSetId, int $cardId): array
     {
-        abort_unless($card->game_card_set_id === $gameCardSet->id, 404);
+        $set = GameCardSet::findOrFail($gameCardSetId);
+        $card = GameCard::findOrFail($cardId);
+
+        abort_unless($card->game_card_set_id === $set->id, 404);
+
+        return [$set, $card];
     }
 }
