@@ -49,7 +49,7 @@ Route::prefix('admin')
         Route::resource('game-card-sets', AdminGameCardSetController::class);
         Route::get('game-card-sets/{gameCardSet}/cards/create', [AdminGameCardController::class, 'create'])->name('game-cards.create');
         Route::post('game-card-sets/{gameCardSet}/cards', [AdminGameCardController::class, 'store'])->name('game-cards.store');
-        Route::get('game-card-sets/{gameCardSet}/cards/{card}/edit', [AdminGameCardController::class, 'edit'])->name('game-cards.edit');
+        Route::get('game-cards/{card}/edit', [AdminGameCardController::class, 'edit'])->name('game-cards.edit');
         Route::put('game-card-sets/{gameCardSet}/cards/{card}', [AdminGameCardController::class, 'update'])->name('game-cards.update');
         Route::delete('game-card-sets/{gameCardSet}/cards/{card}', [AdminGameCardController::class, 'destroy'])->name('game-cards.destroy');
         Route::post('game-card-sets/{gameCardSet}/cards/{card}/move-up', [AdminGameCardController::class, 'moveUp'])->name('game-cards.move-up');

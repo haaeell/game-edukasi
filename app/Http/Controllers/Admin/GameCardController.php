@@ -35,9 +35,10 @@ class GameCardController extends Controller
         return redirect()->route('admin.game-card-sets.show', $set)->with('success', 'Kartu berhasil ditambahkan.');
     }
 
-    public function edit(int $gameCardSet, int $card): View
+    public function edit(int $card): View
     {
-        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
+        $gameCard = GameCard::findOrFail($card);
+        $set = GameCardSet::findOrFail($gameCard->game_card_set_id);
 
         return view('admin.game-cards.edit', [
             'set' => $set,
