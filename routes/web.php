@@ -50,10 +50,10 @@ Route::prefix('admin')
         Route::get('game-card-sets/{gameCardSet}/cards/create', [AdminGameCardController::class, 'create'])->name('game-cards.create');
         Route::post('game-card-sets/{gameCardSet}/cards', [AdminGameCardController::class, 'store'])->name('game-cards.store');
         Route::get('game-cards/{card}/edit', [AdminGameCardController::class, 'edit'])->name('game-cards.edit');
-        Route::put('game-card-sets/{gameCardSet}/cards/{card}', [AdminGameCardController::class, 'update'])->name('game-cards.update');
-        Route::delete('game-card-sets/{gameCardSet}/cards/{card}', [AdminGameCardController::class, 'destroy'])->name('game-cards.destroy');
-        Route::post('game-card-sets/{gameCardSet}/cards/{card}/move-up', [AdminGameCardController::class, 'moveUp'])->name('game-cards.move-up');
-        Route::post('game-card-sets/{gameCardSet}/cards/{card}/move-down', [AdminGameCardController::class, 'moveDown'])->name('game-cards.move-down');
+        Route::put('game-cards/{card}', [AdminGameCardController::class, 'update'])->name('game-cards.update');
+        Route::delete('game-cards/{card}', [AdminGameCardController::class, 'destroy'])->name('game-cards.destroy');
+        Route::post('game-cards/{card}/move-up', [AdminGameCardController::class, 'moveUp'])->name('game-cards.move-up');
+        Route::post('game-cards/{card}/move-down', [AdminGameCardController::class, 'moveDown'])->name('game-cards.move-down');
         Route::get('room-reports', [AdminRoomReportController::class, 'index'])->name('room-reports.index');
         Route::post('room-reports/{gameRoom}/end', [AdminRoomReportController::class, 'end'])->name('room-reports.end');
         Route::delete('room-reports/{gameRoom}', [AdminRoomReportController::class, 'destroy'])->name('room-reports.destroy');

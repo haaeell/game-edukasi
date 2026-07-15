@@ -29,7 +29,7 @@
 
                         <div class="flex flex-wrap gap-2">
                             <a href="{{ route('admin.game-cards.edit', $card) }}" class="btn-secondary">Edit</a>
-                            <form action="{{ route('admin.game-cards.destroy', [$set, $card]) }}" method="POST" class="delete-form">
+                            <form action="{{ route('admin.game-cards.destroy', $card) }}" method="POST" class="delete-form">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn-secondary">Hapus</button>

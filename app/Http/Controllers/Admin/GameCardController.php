@@ -46,18 +46,19 @@ class GameCardController extends Controller
         ]);
     }
 
-    public function update(UpdateGameCardRequest $request, int $gameCardSet, int $card): RedirectResponse
+    public function update(UpdateGameCardRequest $request, int $card): RedirectResponse
     {
-        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
+        $gameCard = GameCard::findOrFail($card);
 
         $gameCard->update($request->validated());
 
-        return redirect()->route('admin.game-card-sets.show', $set)->with('success', 'Kartu berhasil diperbarui.');
+        return redirect()->route('admin.game-card-sets.show', $gameCard->game_card_set_id)->with('success', 'Kartu berhasil diperbarui.');
     }
 
-    public function destroy(int $gameCardSet, int $card): RedirectResponse
+    public function destroy(int $card): RedirectResponse
     {
-        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
+        $gameCard = GameCard::findOrFail($card);
+        $set = GameCardSet::findOrFail($gameCard->game_card_set_id);
 
         $deletedOrder = $gameCard->order_number;
         $gameCard->delete();
@@ -69,9 +70,10 @@ class GameCardController extends Controller
         return redirect()->route('admin.game-card-sets.show', $set)->with('success', 'Kartu berhasil dihapus.');
     }
 
-    public function moveUp(int $gameCardSet, int $card): RedirectResponse
+    public function moveUp(int $card): RedirectResponse
     {
-        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
+        $gameCard = GameCard::findOrFail($card);
+        $set = GameCardSet::findOrFail($gameCard->game_card_set_id);
 
         $previous = $set->cards()
             ->where('order_number', '<', $gameCard->order_number)
@@ -87,9 +89,10 @@ class GameCardController extends Controller
         return back()->with('success', 'Urutan kartu diperbarui.');
     }
 
-    public function moveDown(int $gameCardSet, int $card): RedirectResponse
+    public function moveDown(int $card): RedirectResponse
     {
-        [$set, $gameCard] = $this->findSetAndCard($gameCardSet, $card);
+        $gameCard = GameCard::findOrFail($card);
+        $set = GameCardSet::findOrFail($gameCard->game_card_set_id);
 
         $next = $set->cards()
             ->where('order_number', '>', $gameCard->order_number)
@@ -103,18 +106,5 @@ class GameCardController extends Controller
         }
 
         return back()->with('success', 'Urutan kartu diperbarui.');
-    }
-
-    /**
-     * @return array{0: GameCardSet, 1: GameCard}
-     */
-    private function findSetAndCard(int $gameCardSetId, int $cardId): array
-    {
-        $set = GameCardSet::findOrFail($gameCardSetId);
-        $card = GameCard::findOrFail($cardId);
-
-        abort_unless($card->game_card_set_id === $set->id, 404);
-
-        return [$set, $card];
     }
 }
